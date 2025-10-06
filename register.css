@@ -1,0 +1,84 @@
+/* Ensure body takes up 100% height for the two-column view */
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: #333; /* Dark grey */
+}
+
+/* The left panel background color (only visible on desktop)
+    The height setting is important for the two-column layout.
+*/
+.custom-bg-left {
+    background-color: #e9e9e9; 
+    color: #000;
+    min-height: 100vh; /* Full viewport height on desktop */
+}
+
+/* Ensure the Lost & Found text is large and bold (Desktop view) */
+.custom-bg-left h1 {
+    font-size: 5rem;
+}
+
+/* Form container to control the width. 
+    On mobile, this max-width helps center the form in the middle.
+*/
+.form-container {
+    max-width: 400px; 
+    width: 100%;
+    text-align: left; 
+}
+
+/* Mobile-specific styling for the right panel (form) */
+.col-12.bg-white {
+    border-radius: 0;
+    padding-top: 5rem !important;
+}
+
+
+/* Media Query for Desktop (Medium screen and up) */
+@media (min-width: 768px) {
+    .container-fluid {
+        min-height: 100vh; /* Full height on desktop */
+    }
+    
+    .col-md-6.bg-white {
+        min-height: 100vh; /* Full height on desktop */
+    }
+
+    body {
+        background-color: #fff; /* Reset body background on desktop */
+    }
+}
+
+
+/* Custom button styling for the light grey Login button */
+.custom-btn-login {
+    background-color: #dcdcdc; 
+    border: none;
+    color: #000;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem; 
+    border-radius: 0.5rem; 
+    transition: background-color 0.3s;
+}
+
+.custom-btn-login:hover {
+    background-color: #c9c9c9;
+    color: #000;
+}
+
+/* Style for the links */
+.custom-link-color {
+    color: #000;
+}
+
+.custom-link-color:hover {
+    color: #555;
+}
+
+/* Input fields */
+.custom-input {
+    padding: 0.75rem 0.5rem; 
+}

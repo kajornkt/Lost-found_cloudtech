@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost & Found - Sign Up</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="register.css">
+</head>
+<body>
+    <div class="container-fluid d-flex p-0">
+        <!--Left Panel-->
+        <div class="col-md-6 custom-bg-left d-none d-md-block position-sticky top-0 vh-100">
+            <div class="d-flex flex-column align-items-center h-100 pt-5">
+                <h1 class="display-3 text-dark fw-bold mb-auto align-self-start ms-4" style="margin-top: 30%;">Lost & Found</h1>
+                <p class="text-dark small mb-3 align-self-start ms-4">Made by (our name &lt;3)</p>
+            </div>
+        </div>
+
+        <!--Right Panel-->
+        <div class="col-12 col-md-6 bg-white d-flex flex-column justify-content-start p-5">
+            <div class="form-container mx-auto">
+                <h2 class="display-3 fw-bold mb-5">Sign up</h2>
+
+                <form>
+                    <!-- Name Field -->
+                    <div class="mb-3">
+                        <label for="nameInput" class="form-label fw-bold">Name</label>
+                        <input type="text" class="form-control custom-input" id="nameInput" placeholder="Name Surname">
+                    </div>
+
+                    <!-- Faculty and Class Year (Side-by-side using a Bootstrap row) -->
+                     <!--Edit the option later-->
+                    <div class="row mb-3">
+                        <div class="col-7">
+                            <label for="facultySelect" class="form-label fw-bold">Faculty</label>
+                            <select class="form-select custom-input" id="facultySelect">
+                                <option selected>select</option>
+                                <option value="1">Engineering</option>
+                                <option value="2">Architecture</option>
+                                <option value="3">Science</option>
+                            </select>
+                        </div>
+                        <div class="col-5">
+                            <label for="classYearInput" class="form-label fw-bold">Class year</label>
+                            <input type="number" class="form-control custom-input" id="classYearInput" placeholder="year number">
+                        </div>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label for="emailInput" class="form-label fw-bold">Email</label>
+                        <input type="email" class="form-control custom-input" id="emailInput" placeholder="xxxxxx@kmitl.ac.th">
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-3">
+                        <label for="passwordInput" class="form-label fw-bold">Password</label>
+                        <input type="password" class="form-control custom-input" id="passwordInput" placeholder="your password">
+                    </div>
+                    
+                    <!-- Confirm Password Field -->
+                    <div class="mb-4">
+                        <label for="confirmPasswordInput" class="form-label fw-bold">Confirm password</label>
+                        <input type="password" class="form-control custom-input" id="confirmPasswordInput" placeholder="confirm your password">
+                    </div>
+
+                    <!-- Social Accounts Section -->
+                    <label class="form-label fw-bold">Social accounts</label>
+                    <div class="mb-2">
+                        <input type="text" class="form-control custom-input" placeholder="link to social profile 1">
+                    </div>
+                    <div class="mb-2">
+                        <input type="text" class="form-control custom-input" placeholder="link to social profile 2">
+                    </div>
+                    <div class="mb-2">
+                        <input type="text" class="form-control custom-input" placeholder="link to social profile 3">
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" class="form-control custom-input" placeholder="link to social profile 4">
+                    </div>
+                    
+                    <!-- Sign In Link -->
+                    <div class="text-end mb-4">
+                        <span class="small">Already have an account? </span>
+                        <a href="signin.html" class="text-decoration-none custom-link-color small fw-bold">sign in</a>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-block w-100 custom-btn-login p-2">Create new account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
