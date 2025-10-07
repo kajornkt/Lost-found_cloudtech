@@ -1,23 +1,35 @@
 <!-- Mobile Navigation Wrapper -->
-<div class="d-block d-md-none fixed-top border-bottom shadow-sm custom-header" style="z-index: 1040; background-color: white;">
-    <!-- Mobile Header -->
-    <header class="px-4 py-3 d-flex justify-content-between align-items-center">
-        <button class="btn p-0 text-dark" id="mobile-sidebar-toggle">
+<div class="d-md-none mobile-header-fixed">
+    <!-- Collapsible content (the navigation links) -->
+    <div class="collapse" id="mobileNavbarContent">
+        <div class="custom-sidebar-bg p-4" id="mobile-nav-content">
+            <!-- Navigation Links -->
+            <nav class="nav flex-column mb-4">
+                <a class="nav-link custom-nav-link active" href="index.html"><i class="fas fa-home me-3 ms-3"></i>Home</a>
+                <a class="nav-link custom-nav-link" href="#"><i class="fas fa-user-circle me-3 ms-3"></i>Profile</a>
+            </nav>
+            <!-- Logout Button (Stays at the bottom of the collapsed view) -->
+            <div class="pt-2 justify-content-center">
+                <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-3 p-2"></i>Logout</a>
+            </div>
+        </div>
+    </div>
+    <!-- Mobile Header (Always visible) -->
+    <header class="px-4 py-3 d-flex justify-content-between align-items-center custom-header">
+        <button class="navbar-toggler p-0 text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNavbarContent" aria-controls="mobileNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
             <i class="fas fa-bars fa-lg"></i>
         </button>
         <h5 class="m-0 fw-bold">Lost & Found</h5>
         <div style="width: 24px; height: 1.5rem;"></div> 
     </header>
 </div>
-<!-- Sidebar Navigation (Now Fixed on Desktop) -->
-<!-- Removed vh-100 and inline style, letting CSS media query handle fixed positioning and styling -->
-<div class="col-md-3 custom-sidebar-bg p-4 d-md-block" id="sidebar-menu"> 
+<!-- Desktop Sidebar Navigation (Fixed on Desktop) -->
+<div class="col-md-3 custom-sidebar-bg p-4 d-none d-md-block" id="desktop-sidebar"> 
     <h2 class="fw-bold mb-5">Lost&Found</h2>
-    <nav class="nav flex-column">
+    <nav class="nav flex-column flex-grow-1"> <!-- Don't forget to change 'Active' and add the file inside href -->
         <a class="nav-link custom-nav-link active" href="index.html"><i class="fas fa-home me-3 ms-3"></i>Home</a>
         <a class="nav-link custom-nav-link" href="#"><i class="fas fa-user-circle me-3 ms-3"></i>Profile</a>
     </nav>
-    <!-- Logout pushed to bottom of fixed sidebar -->
     <div class="pt-5 justify-content-center mt-auto">
         <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-3 p-2"></i>Logout</a>
     </div>
