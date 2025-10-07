@@ -3,3 +3,82 @@ body {
     font-family: 'Gabarito', sans-serif;
     background-color: #f4f4f4;
 }
+
+/*======================================================
+   Side bar
+   ======================================================= */
+
+.custom-sidebar-bg {
+    background-color: #e9e9e9;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Sidebar Navigation Links */
+.custom-nav-link {
+    color: #000;
+    padding: 1rem 0;
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
+.custom-nav-link:hover {
+    background-color: #dcdcdc;
+    color: #000;
+}
+
+.custom-nav-link.active {
+    background-color: #dcdcdc; /* Subtle highlight for the active link */
+    font-weight: bold;
+}
+
+.custom-logout {
+    color: #000;
+    padding: 0.5rem 0;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    text-align: center;
+    background-color: #ddacac;
+}
+
+/* Custom CSS for Mobile Sidebar Behavior (Off-canvas effect) */
+        @media (max-width: 767.98px) {
+            #sidebar-menu {
+                /* Initial state for mobile: fixed, off-screen, full height */
+                position: fixed;
+                left: -280px; 
+                width: 280px; 
+                z-index: 1050; /* Ensure it overlays content */
+                transition: left 0.3s ease-in-out;
+            }
+            #sidebar-menu.sidebar-open {
+                /* Slide in */
+                left: 0;
+            }
+            #main-feed {
+                /* Adjusted padding-top for the combined fixed mobile header and search bar (~130px) */
+                padding-top: 130px !important; 
+            }
+            /* Removed .mobile-search-fixed custom styles as the wrapper now handles fixing */
+        }
+        /* Style for the sidebar on desktop (md+) */
+        @media (min-width: 768px) {
+            #sidebar-menu {
+                position: sticky !important;
+                left: 0 !important;
+            }
+        }
+
+footer {
+    font-size: 0.75rem;
+    color: #888;
+    padding-bottom: 1rem;
+    background-color: #f4f4f4;
+}
+
+.custom-header {
+    background-color: #f4f4f4;
+    z-index: 1040;
+}
