@@ -1,3 +1,39 @@
+/* =======================================================
+   Home Page / Sidebar Styles
+   ======================================================= */
+
+/* Sidebar Background (Light Grey) */
+.custom-sidebar-bg {
+    background-color: #e9e9e9;
+    color: #000;
+    /* Uses flex for vertical alignment and pushing the Logout to the bottom */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Sidebar Navigation Links */
+.custom-nav-link {
+    color: #000;
+    padding: 1rem 0;
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
+.custom-nav-link:hover {
+    background-color: #dcdcdc;
+    color: #000;
+}
+
+.custom-nav-link.active {
+    background-color: #dcdcdc; /* Subtle highlight for the active link */
+    font-weight: bold;
+}
+
+/* =======================================================
+   Home Page / Feed Styles (Search, Filters, Cards)
+   ======================================================= */
+
 .custom-search-input {
     border-color: #ccc;
     border-radius: 0;

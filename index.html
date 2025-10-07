@@ -8,29 +8,23 @@
     <link rel="stylesheet" href="home.css"> 
     <link rel="stylesheet" href="global.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <style>
-        
-    </style>
 </head>
 <body>
 
     <div class="container-fluid d-flex p-0">
         
         <!-- Mobile Navigation Wrapper (Header + Search Bar) -->
-        <!-- This single fixed-top container holds both the header and the search input on small screens -->
         <div class="d-block d-md-none fixed-top border-bottom shadow-sm custom-header">
-            <!-- Mobile Header (Now just a standard header inside the fixed div) -->
+            <!-- Mobile Header -->
             <header class="px-4 py-3 d-flex justify-content-between align-items-center">
                 <button class="btn p-0 text-dark" id="mobile-sidebar-toggle">
                     <i class="fas fa-bars fa-lg"></i>
                 </button>
                 <h5 class="m-0 fw-bold">Lost & Found</h5>
-                <!-- Placeholder to balance the space -->
                 <div style="width: 24px; height: 1.5rem;"></div> 
             </header>
 
-            <!-- Mobile Search Bar (Now styled with padding/margin inside the fixed wrapper) -->
+            <!-- Mobile Search Bar -->
             <div class="px-4 pb-3">
                 <div class="input-group search-bar">
                     <span class="input-group-text custom-search-icon" id="search-addon-mobile"><i class="fas fa-search"></i></span>
@@ -40,20 +34,19 @@
             </div>
         </div>
 
-        <!-- Sidebar Navigation (d-md-block ensures visibility on desktop, custom CSS/JS handles mobile hide/show) -->
-        <div class="col-md-3 custom-sidebar-bg vh-100 p-4 d-md-block" 
-             id="sidebar-menu" 
-             style="background-color: #f4f4f4;"> 
-            <h2 class="fw-bold mb-5">Lost & Found</h2>
+        <!-- Sidebar Navigation (Now Fixed on Desktop) -->
+        <!-- Removed vh-100 and inline style, letting CSS media query handle fixed positioning and styling -->
+        <div class="col-md-3 custom-sidebar-bg p-4 d-md-block" id="sidebar-menu"> 
+            <h2 class="fw-bold mb-5">Lost&Found</h2>
 
-            <nav class="nav flex-column mb-auto">
+            <nav class="nav flex-column">
                 <a class="nav-link custom-nav-link active" href="index.html"><i class="fas fa-home me-3 ms-3"></i>Home</a>
                 <a class="nav-link custom-nav-link" href="#"><i class="fas fa-user-circle me-3 ms-3"></i>Profile</a>
-                <a class="nav-link custom-nav-link" href="#"><i class="fas fa-comments me-3 ms-3"></i>Chat</a>
             </nav>
 
-            <div class="pt-5 justify-content-center" style="margin-top: 100%;">
-                <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-3"></i>Logout</a>
+            <!-- Logout pushed to bottom of fixed sidebar -->
+            <div class="pt-5 justify-content-center mt-auto">
+                <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-3 p-2"></i>Logout</a>
             </div>
         </div>
 
