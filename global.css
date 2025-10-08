@@ -3,7 +3,6 @@
 
 body {
     font-family: 'Gabarito', sans-serif;
-    background-color: #f4f4f4;
 }
 /*======================================================
    Side bar
@@ -12,34 +11,54 @@ body {
 /* The container for the sidebar is set to flex-column */
 .custom-sidebar-bg {
     background-color: #e9e9e9;
-    color: #000;
+    color: #e9e9e9;
     display: flex;
     flex-direction: column; 
     justify-content: flex-start;
 }
+
 /* Sidebar Navigation Links */
 .custom-nav-link {
-    color: #000;
+    color: #dcdcdc;
     padding: 1rem 0;
     border-radius: 0.5rem;
     font-weight: 500;
 }
 .custom-nav-link:hover {
     background-color: #dcdcdc;
-    color: #000;
+    color: #2F455C;
 }
 .custom-nav-link.active {
     background-color: #dcdcdc; /* Subtle highlight for the active link */
     font-weight: bold;
+    color: #2F455C;
 }
+
+/* Sidebar Navigation Links */
+.custom-nav-link-mobile {
+    color: #2F455C;
+    padding: 1rem 0;
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+.custom-nav-link-mobile:hover {
+    background-color: #FFFFFF;
+    color: #2F455C;
+}
+.custom-nav-link-mobile.active {
+    background-color: #dcdcdc; /* Subtle highlight for the active link */
+    font-weight: bold;
+    color: #2F455C;
+}
+
 /* Logout button style */
 .custom-logout {
-    color: #000;
+    color: #343a40;
     padding: 0.5rem 0;
     border-radius: 0.5rem;
     font-weight: 500;
     text-align: center;
-    background-color: #ddacac;
+    background-color: #1DCDFE;
     display: block;
 }
 /* ------------------------------------------- */
@@ -77,11 +96,10 @@ body {
         width: 25%;
         height: 100vh; /* CRITICAL for Flexbox to push content down */
         z-index: 1000;
-        background-color: #f4f4f4; /* Apply background color for desktop fixed element */
+        background-color: #2F455C; /* Apply background color for desktop fixed element */
     }
     
     .main-content {
-
         margin-left: 25%;
         width: 75%; 
     }
@@ -93,7 +111,9 @@ footer {
     padding-bottom: 1rem;
     background-color: #f4f4f4;
 }
+
 .custom-header {
-    background-color: #f4f4f4;
+    background-color: #2F455C;
     z-index: 1040;
+    color: #dcdcdc;
 }
