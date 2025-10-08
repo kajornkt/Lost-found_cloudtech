@@ -6,149 +6,226 @@
     <title>Lost&Found - Home page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="home.css">
     <link rel="stylesheet" href="global.css">
+    <style>
+        .custom-search-input {
+            border-color: #ccc;
+            border-radius: 0.5rem; /* Added rounding for aesthetics */
+        }
+
+        .custom-search-icon {
+            background-color: #fff;
+            border-color: #ccc;
+            color: #555;
+            border-radius: 0.5rem 0 0 0.5rem !important;
+        }
+        .input-group span:last-child {
+            border-radius: 0 0.5rem 0.5rem 0 !important;
+        }
+        .custom-card {
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ccc;
+        }
+        .custom-btn-create { 
+            background-color: #ffc107; 
+            color: #343a40; 
+            border: none; 
+            font-weight: 600; 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .custom-btn-create:hover { background-color: #ffda6a; }
+        .custom-btn-filter { 
+            background-color: #f8f9fa; 
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s; 
+        }
+        .custom-btn-filter:hover {
+            background-color: #e9ecef;
+        }
+        .custom-btn-filter.active { 
+            background-color: #343a40; 
+            color: white; 
+            border-color: #343a40; 
+        }
+        .custom-btn-detail { 
+            background-color: #212529; 
+            color: white; 
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .custom-btn-detail:hover { background-color: #495057; }
+        .custom-badge-lost { 
+            background-color: #dc3545; 
+            color: white; 
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        .custom-badge-found {
+            background-color: #28a745;
+            color: white; 
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        .custom-placeholder-image { 
+            background-color: #e9ecef; 
+            height: 150px; 
+            border-radius: 0.5rem; 
+        }
+    </style>
 </head>
 <body>
 
     <div class="container-fluid d-flex p-0">
-        
-        <!-- Mobile Navigation Wrapper (Header + Search Bar + Collapsed Menu) -->
-        <div class="d-md-none mobile-header-fixed">
-            <!-- Collapsible content (the navigation links) -->
-            <div class="collapse" id="mobileNavbarContent">
-                <div class="custom-sidebar-bg p-4" id="mobile-nav-content">
-                    <!-- Navigation Links -->
-                    <nav class="nav flex-column mb-4">
-                        <a class="nav-link custom-nav-link active" href="index.html"><i class="fas fa-home me-3 ms-3"></i>Home</a>
-                        <a class="nav-link custom-nav-link" href="#"><i class="fas fa-user-circle me-3 ms-3"></i>Profile</a>
-                    </nav>
+        <section>
+            <!-- Mobile Navigation Wrapper (Header + Search Bar + Collapsed Menu) -->
+            <div class="d-md-none mobile-header-fixed">
+                <!-- Collapsible content (the navigation links) -->
+                <div class="collapse" id="mobileNavbarContent">
+                    <div class="custom-sidebar-bg p-4" id="mobile-nav-content">
+                        <!-- Navigation Links -->
+                        <nav class="nav flex-column mb-4">
+                            <a class="nav-link custom-nav-link active" href="index.html"><i class="fas fa-home me-3 ms-3"></i>Home</a>
+                            <a class="nav-link custom-nav-link" href="#"><i class="fas fa-user-circle me-3 ms-3"></i>Profile</a>
+                        </nav>
 
-                    <!-- Logout Button (Stays at the bottom of the collapsed view) -->
-                    <div class="pt-2 justify-content-center">
-                        <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-3 p-2"></i>Logout</a>
+                        <!-- Logout Button (Stays at the bottom of the collapsed view) -->
+                        <div class="pt-2 justify-content-center">
+                            <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-3 p-2"></i>Logout</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Header (Always visible) -->
+                <header class="px-4 py-3 d-flex justify-content-between align-items-center custom-header">
+                    <button class="navbar-toggler p-0 text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNavbarContent" aria-controls="mobileNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fas fa-bars fa-lg"></i>
+                    </button>
+                    <h5 class="m-0 fw-bold">Lost & Found</h5>
+                    <div style="width: 24px; height: 1.5rem;"></div> 
+                </header>
+
+                <!-- Mobile Search Bar (Always visible) -->
+                <div class="px-4 pb-3 border-bottom custom-header">
+                    <div class="input-group search-bar">
+                        <span class="input-group-text custom-search-icon" id="search-addon-mobile"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control custom-search-input" placeholder="Search" aria-label="Search" aria-describedby="search-addon-mobile">
+                        <span class="input-group-text custom-search-icon border-start-0" id="clear-addon-mobile"><i class="fas fa-times"></i></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Mobile Header (Always visible) -->
-            <header class="px-4 py-3 d-flex justify-content-between align-items-center custom-header">
-                <button class="navbar-toggler p-0 text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNavbarContent" aria-controls="mobileNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="fas fa-bars fa-lg"></i>
-                </button>
-                <h5 class="m-0 fw-bold">Lost & Found</h5>
-                <div style="width: 24px; height: 1.5rem;"></div> 
-            </header>
+            <!-- Desktop Sidebar Navigation (Fixed on Desktop) -->
+            <div class="col-md-3 custom-sidebar-bg p-4 d-none d-md-block" id="desktop-sidebar"> 
+                <h2 class="fw-bold mb-5">Lost&Found</h2>
 
-            <!-- Mobile Search Bar (Always visible) -->
-            <div class="px-4 pb-3 border-bottom custom-header">
-                <div class="input-group search-bar">
-                    <span class="input-group-text custom-search-icon" id="search-addon-mobile"><i class="fas fa-search"></i></span>
-                    <input type="text" class="form-control custom-search-input" placeholder="Search" aria-label="Search" aria-describedby="search-addon-mobile">
-                    <span class="input-group-text custom-search-icon border-start-0" id="clear-addon-mobile"><i class="fas fa-times"></i></span>
+                <nav class="nav flex-column flex-grow-1">
+                    <a class="nav-link custom-nav-link active" href="index.html"><i class="fas fa-home me-3 ms-3"></i>Home</a>
+                    <a class="nav-link custom-nav-link" href="#"><i class="fas fa-user-circle me-3 ms-3"></i>Profile</a>
+                </nav>
+
+                <div class="pt-5 justify-content-center mt-auto">
+                    <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-3 p-2"></i>Logout</a>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Desktop Sidebar Navigation (Fixed on Desktop) -->
-        <div class="col-md-3 custom-sidebar-bg p-4 d-none d-md-block" id="desktop-sidebar"> 
-            <h2 class="fw-bold mb-5">Lost&Found</h2>
-
-            <nav class="nav flex-column flex-grow-1">
-                <a class="nav-link custom-nav-link active" href="index.html"><i class="fas fa-home me-3 ms-3"></i>Home</a>
-                <a class="nav-link custom-nav-link" href="#"><i class="fas fa-user-circle me-3 ms-3"></i>Profile</a>
-            </nav>
-
-            <div class="pt-5 justify-content-center mt-auto">
-                <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-3 p-2"></i>Logout</a>
-            </div>
-        </div>
-
-        <!-- Main Feed Content -->
-        <div class="col-12 col-md-9 bg-white px-0 d-flex flex-column min-vh-100" id="main-feed">
-            
-            <!-- Content Wrapper: flex-grow-1 pushes the footer down -->
-            <div class="flex-grow-1">
-                <div class="px-4 px-md-5 py-4 py-md-5">
-                    
-                    <!-- Search Box Section (Desktop only) -->
-                    <div class="d-none d-md-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
-                        <div class="input-group search-bar mb-3 mb-md-0">
-                            <span class="input-group-text custom-search-icon" id="search-addon"><i class="fas fa-search"></i></span>
-                            <input type="text" class="form-control custom-search-input" placeholder="Search" aria-label="Search" aria-describedby="search-addon">
-                            <span class="input-group-text custom-search-icon border-start-0" id="clear-addon"><i class="fas fa-times"></i></span>
-                        </div>
-                    </div>
-
-                    <!-- Top Bar: Create Post and Filters -->
-                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
-                        <!-- Create Post Button -->
-                        <button class="btn btn-sm custom-btn-create me-3 mb-3 mb-md-0 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-plus me-2"></i>Create your post
-                        </button>
-
-                        <!-- Filter Buttons (Lost/Found) -->
-                        <div class="d-flex align-items-center">
-                            <div class="me-3"><i class="fas fa-filter me-2"></i></div>
-                            <button type="button" class="btn custom-btn-filter me-2" id="btn-filter-lost" data-filter="Lost">Lost</button>
-                            <button type="button" class="btn custom-btn-filter" id="btn-filter-found" data-filter="Found">Found</button>
-                        </div>
-                    </div>
-
-                    <!-- Content Grid: Item Cards -->
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="post-grid">
+        <section>
+            <!-- Main Feed Content -->
+            <div class="col-12 col-md-9 bg-white px-0 d-flex flex-column min-vh-100" id="main-feed">
+                
+                <!-- Content Wrapper: flex-grow-1 pushes the footer down -->
+                <div class="flex-grow-1">
+                    <div class="px-4 px-md-5 py-4 py-md-5">
                         
-                        <!-- Example 1: Lost Item -->
-                        <div class="col" data-category="Lost"> 
-                            <div class="card custom-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title fw-bold">Wallet</h5>
-                                        <span class="badge custom-badge-lost">Lost</span>
-                                    </div>
-                                    <p class="card-text small text-muted mb-1">Jane Doe</p>
-                                    <p class="card-text small text-muted mb-3">2 hours ago</p>
-                                    <div class="custom-placeholder-image mb-3"></div>
-                                    <button class="btn custom-btn-detail w-100">Detail</button>
-                                </div>
+                        <!-- Search Box Section (Desktop only) -->
+                        <div class="d-none d-md-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+                            <div class="input-group search-bar mb-3 mb-md-0">
+                                <span class="input-group-text custom-search-icon" id="search-addon"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control custom-search-input" placeholder="Search" aria-label="Search" aria-describedby="search-addon">
+                                <span class="input-group-text custom-search-icon border-start-0" id="clear-addon"><i class="fas fa-times"></i></span>
                             </div>
                         </div>
 
-                        <!-- Example 2: Found Item -->
-                        <div class="col" data-category="Found">
-                            <div class="card custom-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title fw-bold">Keys</h5>
-                                        <span class="badge custom-badge-found">Found</span>
-                                    </div>
-                                    <p class="card-text small text-muted mb-1">John Smith</p>
-                                    <p class="card-text small text-muted mb-3">1 day ago</p>
-                                    <div class="custom-placeholder-image mb-3"></div>
-                                    <button class="btn custom-btn-detail w-100">Detail</button>
-                                </div>
+                        <!-- Top Bar: Create Post and Filters -->
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+                            <!-- Create Post Button -->
+                            <button class="btn btn-sm custom-btn-create me-3 mb-3 mb-md-0 d-flex align-items-center justify-content-center">
+                                <i class="fas fa-plus me-2"></i>Create your post
+                            </button>
+
+                            <!-- Filter Buttons (Lost/Found) -->
+                            <div class="d-flex align-items-center">
+                                <div class="me-3"><i class="fas fa-filter me-2"></i></div>
+                                <button type="button" class="btn custom-btn-filter me-2" id="btn-filter-lost" data-filter="Lost">Lost</button>
+                                <button type="button" class="btn custom-btn-filter" id="btn-filter-found" data-filter="Found">Found</button>
                             </div>
                         </div>
-                        
-                        <!-- Repeat cards for a scrollable effect --> 
-                        <div class="col" data-category="Lost"><div class="card custom-card"><div class="card-body"><div class="d-flex justify-content-between align-items-start mb-2"><h5 class="card-title fw-bold">ID Card</h5><span class="badge custom-badge-lost">Lost</span></div><p class="card-text small text-muted mb-1">user's name</p><p class="card-text small text-muted mb-3">timestamp</p><div class="custom-placeholder-image mb-3"></div><button class="btn custom-btn-detail w-100">Detail</button></div></div></div> 
-                        <div class="col" data-category="Found"><div class="card custom-card"><div class="card-body"><div class="d-flex justify-content-between align-items-start mb-2"><h5 class="card-title fw-bold">Phone</h5><span class="badge custom-badge-found">Found</span></div><p class="card-text small text-muted mb-1">user's name</p><p class="card-text small text-muted mb-3">timestamp</p><div class="custom-placeholder-image mb-3"></div><button class="btn custom-btn-detail w-100">Detail</button></div></div></div> 
-                        <div class="col" data-category="Lost"><div class="card custom-card"><div class="card-body"><div class="d-flex justify-content-between align-items-start mb-2"><h5 class="card-title fw-bold">Backpack</h5><span class="badge custom-badge-lost">Lost</span></div><p class="card-text small text-muted mb-1">user's name</p><p class="card-text small text-muted mb-3">timestamp</p><div class="custom-placeholder-image mb-3"></div><button class="btn custom-btn-detail w-100">Detail</button></div></div></div> 
-                        <div class="col" data-category="Lost"><div class="card custom-card"><div class="card-body"><div class="d-flex justify-content-between align-items-start mb-2"><h5 class="card-title fw-bold">Headphones</h5><span class="badge custom-badge-lost">Lost</span></div><p class="card-text small text-muted mb-1">user's name</p><p class="card-text small text-muted mb-3">timestamp</p><div class="custom-placeholder-image mb-3"></div><button class="btn custom-btn-detail w-100">Detail</button></div></div></div> 
-                        <div class="col" data-category="Found"><div class="card custom-card"><div class="card-body"><div class="d-flex justify-content-between align-items-start mb-2"><h5 class="card-title fw-bold">Glasses</h5><span class="badge custom-badge-found">Found</span></div><p class="card-text small text-muted mb-1">user's name</p><p class="card-text small text-muted mb-3">timestamp</p><div class="custom-placeholder-image mb-3"></div><button class="btn custom-btn-detail w-100">Detail</button></div></div></div> 
 
+                        <!-- Content Grid: Item Cards -->
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="post-grid">
+                            
+                            <!-- Example 1: Lost Item -->
+                            <div class="col" data-category="Lost"> 
+                                <div class="card custom-card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="card-title fw-bold">Wallet</h5>
+                                            <span class="badge custom-badge-lost">Lost</span>
+                                        </div>
+                                        <p class="card-text small text-muted mb-1">Jane Doe</p>
+                                        <p class="card-text small text-muted mb-3">2 hours ago</p>
+                                        <div class="custom-placeholder-image mb-3"></div>
+                                        <button class="btn custom-btn-detail w-100">Detail</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Example 2: Found Item -->
+                            <div class="col" data-category="Found">
+                                <div class="card custom-card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="card-title fw-bold">Keys</h5>
+                                            <span class="badge custom-badge-found">Found</span>
+                                        </div>
+                                        <p class="card-text small text-muted mb-1">John Smith</p>
+                                        <p class="card-text small text-muted mb-3">1 day ago</p>
+                                        <div class="custom-placeholder-image mb-3"></div>
+                                        <button class="btn custom-btn-detail w-100">Detail</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Repeat cards for a scrollable effect --> 
+                            <div class="col" data-category="Lost"><div class="card custom-card"><div class="card-body"><div class="d-flex justify-content-between align-items-start mb-2"><h5 class="card-title fw-bold">ID Card</h5><span class="badge custom-badge-lost">Lost</span></div><p class="card-text small text-muted mb-1">user's name</p><p class="card-text small text-muted mb-3">timestamp</p><div class="custom-placeholder-image mb-3"></div><button class="btn custom-btn-detail w-100">Detail</button></div></div></div> 
+                            <div class="col" data-category="Found"><div class="card custom-card"><div class="card-body"><div class="d-flex justify-content-between align-items-start mb-2"><h5 class="card-title fw-bold">Phone</h5><span class="badge custom-badge-found">Found</span></div><p class="card-text small text-muted mb-1">user's name</p><p class="card-text small text-muted mb-3">timestamp</p><div class="custom-placeholder-image mb-3"></div><button class="btn custom-btn-detail w-100">Detail</button></div></div></div> 
+                            <div class="col" data-category="Lost"><div class="card custom-card"><div class="card-body"><div class="d-flex justify-content-between align-items-start mb-2"><h5 class="card-title fw-bold">Backpack</h5><span class="badge custom-badge-lost">Lost</span></div><p class="card-text small text-muted mb-1">user's name</p><p class="card-text small text-muted mb-3">timestamp</p><div class="custom-placeholder-image mb-3"></div><button class="btn custom-btn-detail w-100">Detail</button></div></div></div> 
+                            <div class="col" data-category="Lost"><div class="card custom-card"><div class="card-body"><div class="d-flex justify-content-between align-items-start mb-2"><h5 class="card-title fw-bold">Headphones</h5><span class="badge custom-badge-lost">Lost</span></div><p class="card-text small text-muted mb-1">user's name</p><p class="card-text small text-muted mb-3">timestamp</p><div class="custom-placeholder-image mb-3"></div><button class="btn custom-btn-detail w-100">Detail</button></div></div></div> 
+                            <div class="col" data-category="Found"><div class="card custom-card"><div class="card-body"><div class="d-flex justify-content-between align-items-start mb-2"><h5 class="card-title fw-bold">Glasses</h5><span class="badge custom-badge-found">Found</span></div><p class="card-text small text-muted mb-1">user's name</p><p class="card-text small text-muted mb-3">timestamp</p><div class="custom-placeholder-image mb-3"></div><button class="btn custom-btn-detail w-100">Detail</button></div></div></div> 
+
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Footer Content: Full width, bottom aligned -->
-            <footer class="text-center text-muted small pt-5 mt-auto flex-shrink-0" style="background-color: #f4f4f4;">
-                <p>Made by (our team's name &lt;3)</p>
-                <p>cloud class</p>
-                <p>@team 2025</p>
-            </footer>
+                
+                <!-- Footer Content: Full width, bottom aligned -->
+                <footer class="text-center text-muted small pt-5 mt-auto flex-shrink-0" style="background-color: #f4f4f4;">
+                    <p>Made by (our team's name &lt;3)</p>
+                    <p>cloud class</p>
+                    <p>@team 2025</p>
+                </footer>
 
-        </div>
+            </div>
+        </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
