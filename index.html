@@ -12,7 +12,6 @@
             border-color: #ccc;
             border-radius: 0.5rem; /* Added rounding for aesthetics */
         }
-
         .custom-search-icon {
             background-color: #fff;
             border-color: #ccc;
@@ -29,50 +28,56 @@
             border: 1px solid #ccc;
         }
         .custom-btn-create { 
-            background-color: #ffc107; 
+            background-color: #1DCDFE; 
             color: #343a40; 
             border: none; 
             font-weight: 600; 
             padding: 0.75rem 1.5rem; 
-            border-radius: 0.5rem;
+            border-radius: 2rem;
             transition: background-color 0.2s;
         }
-        .custom-btn-create:hover { background-color: #ffda6a; }
+        .custom-btn-create:hover { background-color: #41b9da; }
         .custom-btn-filter { 
             background-color: #f8f9fa; 
             border: 1px solid #ced4da;
-            border-radius: 0.5rem;
+            border-radius: 2rem;
             font-weight: 500;
             transition: background-color 0.2s, color 0.2s; 
+            border-color: #343a40; 
         }
         .custom-btn-filter:hover {
             background-color: #e9ecef;
         }
-        .custom-btn-filter.active { 
-            background-color: #343a40; 
-            color: white; 
-            border-color: #343a40; 
+        .custom-btn-filter-lost.active { 
+            background-color: #F7D47A; 
+            color: #905512;
+            border: #F7D47A;
+        }
+        .custom-btn-filter-found.active { 
+            background-color: #3ad4ba; 
+            color: #29382E;
+            border: #3ad4ba;
         }
         .custom-btn-detail { 
-            background-color: #212529; 
-            color: white; 
+            background-color: #1DCDFE; 
+            color: #343a40; 
             border-radius: 0.5rem;
             transition: background-color 0.2s;
         }
-        .custom-btn-detail:hover { background-color: #495057; }
+        .custom-btn-detail:hover { background-color: #41b9da; }
         .custom-badge-lost { 
-            background-color: #dc3545; 
-            color: white; 
+            background-color: #F7D47A; 
+            color: #905512; 
             padding: 0.25rem 0.75rem;
-            border-radius: 0.25rem;
+            border-radius: 2rem;
             font-weight: 600;
             font-size: 0.75rem;
         }
         .custom-badge-found {
-            background-color: #28a745;
-            color: white; 
+            background-color: #3ad4ba;
+            color: #29382E; 
             padding: 0.25rem 0.75rem;
-            border-radius: 0.25rem;
+            border-radius: 2rem;
             font-weight: 600;
             font-size: 0.75rem;
         }
@@ -94,23 +99,23 @@
                     <div class="custom-sidebar-bg p-4" id="mobile-nav-content">
                         <!-- Navigation Links -->
                         <nav class="nav flex-column mb-4">
-                            <a class="nav-link custom-nav-link active" href="index.html"><i class="fas fa-home me-3 ms-3"></i>Home</a>
-                            <a class="nav-link custom-nav-link" href="profile.html"><i class="fas fa-user-circle me-3 ms-3"></i>Profile</a>
+                            <a class="nav-link custom-nav-link-mobile active" href="index.html"><i class="fas fa-home me-3 ms-3"></i>Home</a>
+                            <a class="nav-link custom-nav-link-mobile" href="profile.html"><i class="fas fa-user-circle me-3 ms-3"></i>Profile</a>
                         </nav>
 
                         <!-- Logout Button (Stays at the bottom of the collapsed view) -->
                         <div class="pt-2 justify-content-center">
-                            <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-3 p-2"></i>Logout</a>
+                            <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-2 p-2"></i>Logout</a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Mobile Header (Always visible) -->
                 <header class="px-4 py-3 d-flex justify-content-between align-items-center custom-header">
-                    <button class="navbar-toggler p-0 text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNavbarContent" aria-controls="mobileNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <button class="navbar-toggler p-0" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNavbarContent" aria-controls="mobileNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
                         <i class="fas fa-bars fa-lg"></i>
                     </button>
-                    <h5 class="m-0 fw-bold">Lost & Found</h5>
+                    <h5 class="m-0 fw-bold">Lost&Found</h5>
                     <div style="width: 24px; height: 1.5rem;"></div> 
                 </header>
 
@@ -134,7 +139,7 @@
                 </nav>
 
                 <div class="pt-5 justify-content-center mt-auto">
-                    <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-3 p-2"></i>Logout</a>
+                    <a class="nav-link custom-logout" href="signin.html"><i class="fas fa-sign-out-alt me-2 p-2"></i>Logout</a>
                 </div>
             </div>
         </section>
@@ -166,8 +171,8 @@
                         <!-- Filter Buttons (Lost/Found) -->
                         <div class="d-flex align-items-center">
                             <div class="me-3"><i class="fas fa-filter me-2"></i></div>
-                            <button type="button" class="btn custom-btn-filter me-2" id="btn-filter-lost" data-filter="Lost">Lost</button>
-                            <button type="button" class="btn custom-btn-filter" id="btn-filter-found" data-filter="Found">Found</button>
+                            <button type="button" class="btn custom-btn-filter custom-btn-filter-lost me-2" id="btn-filter-lost" data-filter="Lost">Lost</button>
+                            <button type="button" class="btn custom-btn-filter custom-btn-filter-found" id="btn-filter-found" data-filter="Found">Found</button>
                         </div>
                     </div>
 
