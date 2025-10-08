@@ -60,7 +60,7 @@ body {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
-    #main-feed {
+    .main-content {
         /* Adjusted padding-top for the fixed mobile header and search bar (~130px) */
         padding-top: 130px !important; 
     }
@@ -80,7 +80,7 @@ body {
         background-color: #f4f4f4; /* Apply background color for desktop fixed element */
     }
     
-    #main-feed {
+    .main-content {
 
         margin-left: 25%;
         width: 75%; 
