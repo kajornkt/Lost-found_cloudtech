@@ -67,10 +67,46 @@
     
     .main-preview-area { flex-grow: 1; min-height: 0; width: 100%; background-color: var(--bg-input); border: 2px dashed var(--border-color); border-radius: 16px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; }
     .main-preview-area img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
-    .main-preview-placeholder { text-align: center; color: var(--text-muted); }
-    .main-preview-placeholder i { font-size: 44px; margin-bottom: 15px; color: var(--color-action-btn-bg); }
-    .main-preview-placeholder p { font-weight: 600; color: var(--text-dark); font-size: 18px; }
-    
+    .main-preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%; /* Makes sure it fills the dashed box */
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.main-preview-placeholder i {
+  font-size: 44px;
+  margin-bottom: 15px;
+  color: var(--color-action-btn-bg);
+}
+
+.main-preview-placeholder p {
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 18px;
+  margin-bottom: 5px; /* Add a little space */
+}
+
+/* This is the missing style for the subtext */
+.main-preview-placeholder span {
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.select-file-btn {
+  background-color: var(--color-action-btn-bg);
+  color: var(--color-action-btn-text);
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
     .thumbnail-container { flex-shrink: 0; background-color: var(--bg-input); border-radius: 16px; padding: 15px; margin-top: 20px; display: none; }
     .thumbnail-gallery { display: flex; gap: 12px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 5px; }
     .thumbnail-gallery::-webkit-scrollbar { height: 8px; }
@@ -84,7 +120,7 @@
     .thumbnail-item:hover .delete-image-btn { opacity: 1; }
     .add-more-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--border-color); font-size: 24px; border: 2px dashed var(--border-color); transition: all 0.2s ease; }
     .add-more-btn:hover { background-color: var(--bg-input); border-color: #ced4da; color: var(--text-muted); }
-    
+
     .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 1030; background-color: var(--bg-sidebar); color: var(--text-light); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .mobile-navbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
     .mobile-navbar .logo-mobile { font-weight: 600; font-size: 20px; }
@@ -105,10 +141,6 @@
       .right-section { gap: 20px; } /* Adjust gap for mobile stacking */
       .main-preview-area { height: 250px; flex-grow: 0; } /* Give a fixed height on mobile */
       
-      /* THIS RULE WAS IN YOUR CODE, BUT IT HIDES THE BUTTON. I WILL FIX THIS. */
-      /* .form-header { display: none; } */
-      /* NEW RULE TO HIDE ONLY THE TITLE */
-      .form-header h2 { display: none; }
       
       /* ### POST BUTTON ADDED HERE ### */
       .post-btn { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; border-radius: 0; z-index: 1000; padding: 18px; box-shadow: 0 -5px 15px rgba(0,0,0,0.08); }
@@ -120,11 +152,16 @@
 <body>
   
     <aside class="sidebar d-none d-lg-flex">
-      <h2 class="logo">Lost & Found</h2><nav><a href="#"><i class="bi bi-house-door-fill"></i>Home</a><a href="#"><i class="bi bi-person-circle"></i>Profile</a></nav><button class="logout-btn">Logout</button>
+      <h2 class="logo">Lost & Found</h2>
+      <nav>
+        <a href="index.html"><i class="bi bi-house-door-fill"></i>Home</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i>Profile</a>
+      </nav>
+      <button class="logout-btn">Logout</button>
     </aside>
     <header class="mobile-header d-lg-none">
       <nav class="mobile-navbar">
-        <button class="btn text-white fs-2 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenuCollapse" aria-controls="mobileMenuCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="btn text-white fs-2 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenuCollapse">
           <i class="bi bi-list"></i>
         </button>
         <span class="logo-mobile">Lost & Found</span>
@@ -132,11 +169,13 @@
       </nav>
       <div class="collapse" id="mobileMenuCollapse">
         <div class="mobile-menu-body">
-          <a href="#"><i class="bi bi-house-door-fill"></i>Home</a><a href="#"><i class="bi bi-person-circle"></i>Profile</a>
+          <a href="index.html"><i class="bi bi-house-door-fill"></i>Home</a>
+          <a href="profile.html"><i class="bi bi-person-circle"></i>Profile</a>
           <button class="logout-btn-mobile">Logout</button>
         </div>
       </div>
     </header>
+
 
     <main class="content">
       <div class="form-card">
@@ -158,8 +197,11 @@
                 <div class="image-uploader">
                   <div class="main-preview-area" id="mainPreviewArea">
                     <div class="main-preview-placeholder" id="mainPreviewPlaceholder">
-                        <i class="bi bi-cloud-arrow-up-fill"></i>
-                        <p>Choose file to upload</p>
+                      <i class="bi bi-cloud-arrow-up-fill"></i>
+                      <p>Choose file type to upload</p>
+                      <span>JPEG, PNG, PDF up to 50MB</span>
+                      
+                      <button type="button" class="select-file-btn">Select file</button>
                     </div>
                   </div>
                   <div class="thumbnail-container" id="thumbnailContainer">
@@ -181,6 +223,7 @@
     const thumbnailContainer = document.getElementById('thumbnailContainer');
     const thumbnailGallery = document.getElementById('thumbnailGallery');
     const form = document.getElementById('createPostForm');
+    const selectFileBtn = document.querySelector('.select-file-btn');
     let uploadedFiles = [], activeImageIndex = 0;
     function renderImages() {
       thumbnailGallery.innerHTML = '';
@@ -205,6 +248,12 @@
       });
       if (uploadedFiles.length > 0) { updateMainPreview(); }
     }
+    mainPreviewArea.addEventListener('click', () => fileInput.click());
+    selectFileBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent clicking placeholder from also triggering mainPreviewArea
+        fileInput.click();
+    });
+    fileInput.addEventListener('change', (e) => addFiles(e.target.files));
     function setActiveImage(index) { activeImageIndex = index; renderImages(); }
     function updateMainPreview() { if (uploadedFiles.length === 0) return; const activeFile = uploadedFiles[activeImageIndex]; const previewUrl = URL.createObjectURL(activeFile); mainPreviewArea.innerHTML = `<img src="${previewUrl}" alt="Main preview">`; }
     function addFiles(newFiles) { Array.from(newFiles).forEach(file => uploadedFiles.push(file)); activeImageIndex = uploadedFiles.length - 1; renderImages(); }
