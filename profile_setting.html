@@ -10,125 +10,241 @@
     <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+    <link rel="stylesheet" href="global.css">
+
     <style>
+        /* CSS from home.css and global.css consolidated here */
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&display=swap');
+
+        /* Variables needed by the profile_setting styles */
         :root {
-        --font-family: 'Gabarito', sans-serif;
-        --bg-main: #f0f2f5;
-        --bg-card: #ffffff;
-        --bg-sidebar: #2c3e50;
-        --bg-input: #f1f3f5;
-        --color-save-btn-bg: #2ecc71;
-        --color-discard-btn-bg: #e74c3c;
-        --color-action-btn-bg: #5dade2;
-        --color-btn-text: #ffffff;
-        --text-dark: #343a40;
-        --text-light: #ffffff;
-        --text-muted: #6c757d;
-        --border-color: #dee2e6;
-        --border-dashed: #adb5bd;
+            --bg-main: #f0f2f5;
+            --bg-card: #ffffff;
+            --bg-sidebar: #2c3e50;
+            --bg-input: #f1f3f5;
+            --color-save-btn-bg: #2ecc71;
+            --color-discard-btn-bg: #e74c3c;
+            --color-action-btn-bg: #5dade2;
+            --color-btn-text: #ffffff;
+            --text-dark: #343a40;
+            --text-light: #ffffff;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --border-dashed: #adb5bd;
+            --font-family: 'Gabarito', sans-serif;
+            --input-bg-color: #F0F0F0;      /* Added from new CSS */
+            --input-border-color: #E0E0E0; /* Added from new CSS */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
-        background-color: var(--bg-main);
-        font-family: var(--font-family);
-        color: var(--text-dark);
-        }
-        
-        /* --- Sidebar (Desktop) --- */
-        .sidebar {
-        width: 280px;
-        background-color: var(--bg-sidebar);
-        color: var(--text-light);
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        padding: 40px 30px;
-        }
-        .sidebar .logo { font-size: 28px; font-weight: 700; margin-bottom: 60px; }
-        .sidebar nav { flex: 1; }
-        .sidebar nav a {
-        color: var(--text-light);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        padding: 16px;
-        margin-bottom: 15px;
-        border-radius: 12px;
-        font-size: 18px;
-        font-weight: 500;
-        transition: background-color 0.3s ease;
-        }
-        .sidebar nav a i { margin-right: 20px; font-size: 26px; width: 30px; }
-        .sidebar nav a:hover, .sidebar nav a.active { background-color: rgba(255, 255, 255, 0.1); }
-        .logout-btn {
-        background-color: var(--color-action-btn-bg);
-        color: var(--color-btn-text);
-        padding: 14px;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 16px;
-        margin-top: auto;
-        text-align: center;
-        width: 100%;
+            font-family: var(--font-family);
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            overflow-y: visible; 
+            overflow-x: hidden; 
         }
 
-        /* --- Main Content --- */
+        .d-flex.p-0 {
+            height: auto; 
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar (Desktop - DEFAULT 280px) --- */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-sidebar);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            padding: 40px 30px;
+            z-index: 1000;
+            transition: width 0.3s ease, padding 0.3s ease;
+        }
+        .sidebar .logo { 
+            font-size: 28px; 
+            font-weight: 700; 
+            margin-bottom: 60px; 
+            overflow: hidden; 
+            height: 34px;
+        }
+        .sidebar .logo .minimized-text { display: none; }
+        .sidebar nav { flex: 1; }
+        .sidebar nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        .sidebar nav a i { margin-right: 20px; font-size: 26px; width: 30px; }
+        .sidebar nav a span { transition: opacity 0.1s ease; }
+        .sidebar nav a:hover, .sidebar nav a.active { background-color: rgba(255, 255, 255, 0.1); }
+        .logout-btn {
+            background-color: var(--color-action-btn-bg);
+            color: var(--color-btn-text);
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: auto;
+            text-align: center;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        /* --- Mobile Header & Responsive Design --- */
+        .mobile-header { 
+            display: none;
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            z-index: 1030;
+            background-color: var(--bg-sidebar); 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .mobile-navbar {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-light);
+        }
+        .mobile-navbar .logo-mobile { font-weight: 600; font-size: 20px; }
+        .menu-toggle { background: none; border: none; color: var(--text-light); font-size: 24px; }
+        .mobile-menu-body {
+            background-color: var(--bg-card); 
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color); 
+            display: none;
+        }
+        .mobile-menu-body a {
+            display: flex; 
+            align-items: center; 
+            padding: 12px 0;
+            text-decoration: none; 
+            color: var(--text-dark);
+            font-weight: 500; 
+            font-size: 16px; 
+            border-bottom: 1px solid #f1f3f5;
+        }
+        .mobile-menu-body a:last-of-type { border-bottom: none; }
+        .mobile-menu-body a i { margin-right: 15px; font-size: 22px; color: var(--text-muted); }
+        .logout-btn-mobile { width: 100%; margin-top: 15px; }
+
+        /* --- Main Content Container (Desktop) --- */
         .content {
-        margin-left: 280px;
-        padding: 50px;
+            margin-left: 280px; 
+            width: calc(100% - 280px); 
+            padding: 50px;
+            overflow-y: visible;
+            transition: margin-left 0.3s ease, width 0.3s ease; 
+        }
+
+        /* SHRINK BEHAVIOR (Max width 1100px, Min width 768px) */
+        @media (max-width: 1100px) and (min-width: 768px) {
+            .sidebar { width: 90px; padding: 40px 0; }
+            .sidebar .logo .full-text { display: none; }
+            .sidebar .logo .minimized-text { display: block; text-align: center; }
+            .sidebar nav a span { opacity: 0; pointer-events: none; width: 1px; }
+            .sidebar nav a { padding: 16px 30px; justify-content: center; }
+            .sidebar nav a i { margin-right: 0; }
+            .logout-btn {
+                height: 50px; 
+                padding: 0;
+                border-radius: 12px; 
+                width: 50px;
+                margin: 0 auto;
+                font-size: 0;
+                overflow: hidden;
+            }
+            .logout-btn::before {
+                content: '\F444';
+                font-family: 'bootstrap-icons';
+                font-size: 1rem;
+                display: block;
+                margin: auto;
+                padding: 14px 0;
+            }
+            .content { margin-left: 90px; width: calc(100% - 90px); }
+        }
+
+        /* Mobile View (Max width 767.98px) */
+        @media (max-width: 767.98px) {
+            .sidebar { display: none; }
+            .mobile-header { 
+                display: block; 
+                position: fixed;
+                top: 0;
+                width: 100%;
+                z-index: 1050; 
+            }
+            .content { 
+                margin-left: 0; 
+                width: 100%;
+                overflow-y: visible; 
+                padding: 20px 15px;
+                padding-top: 80px;
+            }
+            .profile-card { padding: 25px; }
+            .form-header { margin-bottom: 30px; }
+            .form-header h2 { font-size: 24px; }
+            .form-row { flex-direction: column; gap: 0; }
+            .avatar-preview { width: 120px; height: 120px; font-size: 4rem; }
+            .social-input-wrapper .select-wrapper { flex: 0 0 120px; }
         }
         
+        /* --- Profile Card Content --- */
         .profile-card {
-        background: var(--bg-card);
-        padding: 40px 50px;
-        width: 100%;
-        max-width: 900px;
-        margin: 0 auto;
-        border-radius: 24px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+            background: var(--bg-card);
+            padding: 40px 50px;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
         }
-        
         .form-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 40px;
-        flex-wrap: wrap;
-        gap: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         .form-header h2 { font-size: 32px; font-weight: 700; color: var(--text-dark); }
         .form-header .action-buttons { display: flex; gap: 10px; }
         
         .btn {
-        padding: 10px 25px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 15px;
-        font-family: var(--font-family);
-        transition: opacity 0.3s ease;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            font-family: var(--font-family);
+            transition: opacity 0.3s ease;
         }
         .btn:hover { opacity: 0.85; }
         .btn-save { background-color: var(--color-save-btn-bg); color: var(--color-btn-text); }
         .btn-discard { background-color: var(--color-discard-btn-bg); color: var(--color-btn-text); }
         .btn-select-file { background-color: var(--color-action-btn-bg); color: var(--color-btn-text); }
         
-        /* --- Form Content & Inputs --- */
         .profile-picture-section { text-align: center; margin-bottom: 30px; }
-        .avatar-upload {
-            position: relative;
-            max-width: 150px;
-            margin: auto;
-        }
+        .avatar-upload { position: relative; max-width: 150px; margin: auto; }
         .avatar-preview {
             width: 150px;
             height: 150px;
@@ -144,318 +260,211 @@
             color: var(--text-muted);
         }
         .avatar-preview > img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
+            width: 100%; height: 100%; border-radius: 50%;
+            background-size: cover; background-repeat: no-repeat; background-position: center;
         }
-        
-        .file-input-group {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
+        .file-input-group { display: flex; justify-content: center; margin-top: 20px; }
         #profilePictureInput { display: none; }
-        
         .form-control-file-display {
-            flex-grow: 1;
-            max-width: 200px;
-            margin-left: -8px;
-            padding: 10px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 0 8px 8px 0;
-            background-color: var(--bg-input);
-            font-size: 14px;
-            color: var(--text-muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            flex-grow: 1; max-width: 200px; margin-left: -8px; padding: 10px 15px;
+            border: 1px solid var(--border-color); border-radius: 0 8px 8px 0;
+            background-color: var(--bg-input); font-size: 14px; color: var(--text-muted);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         
         .form-group { margin-bottom: 25px; }
         .form-group label {
-        display: block;
-        font-weight: 600;
-        color: var(--text-dark);
-        font-size: 16px;
-        margin-bottom: 8px;
+            display: block; font-weight: 600; color: var(--text-dark);
+            font-size: 16px; margin-bottom: 8px;
         }
-        
-        .form-row {
-        display: flex;
-        gap: 20px;
-        }
+        .form-row { display: flex; gap: 20px; }
         .form-row > .form-group { width: 100%; }
 
         .form-control-custom {
-        width: 100%;
-        padding: 12px 18px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        background-color: var(--bg-card);
-        font-size: 15px;
-        color: var(--text-dark);
-        font-family: var(--font-family);
-        transition: all 0.2s ease;
+            width: 100%;
+            padding: 12px 18px; /* Original padding */
+            border: 1px solid var(--input-border-color); /* New border color */
+            border-radius: 8px;
+            background-color: var(--input-bg-color); /* New background color */
+            font-size: 15px;
+            color: var(--text-dark);
+            font-family: var(--font-family);
+            transition: all 0.2s ease;
         }
         .form-control-custom:focus {
-        outline: none;
-        border-color: var(--color-action-btn-bg);
-        box-shadow: 0 0 0 3px rgba(93, 173, 226, 0.2);
+            outline: none;
+            border-color: var(--color-action-btn-bg);
+            box-shadow: 0 0 0 3px rgba(93, 173, 226, 0.2);
         }
+        .form-control-custom::placeholder { color: #888; }
         
-        /* --- NEW CUSTOM DROPDOWN STYLES --- */
+        /* NEW, SIMPLIFIED DROPDOWN STYLES */
         .select-wrapper {
-        position: relative;
-        transition: transform 0.2s ease-in-out;
+            position: relative;
         }
-        .select-wrapper:hover {
-        transform: scale(1.02);
+        /* Removes default arrow and adds a custom one */
+        .select-wrapper select.form-control-custom {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 40px; /* Space for the arrow */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
         }
-        .select-wrapper::before { /* Blue background for arrow */
-        content: '';
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        bottom: 5px;
-        width: 38px;
-        background-color: var(--color-action-btn-bg);
-        border-radius: 5px;
-        pointer-events: none;
-        }
-        .select-wrapper::after { /* Custom arrow icon */
-        content: '';
-        position: absolute;
-        top: 50%;
-        right: 18px;
-        transform: translateY(-50%);
-        width: 14px;
-        height: 14px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-        background-size: contain;
-        background-repeat: no-repeat;
-        pointer-events: none;
-        transition: all 0.2s ease;
-        }
-        .select-wrapper select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        padding-right: 60px; /* Make space for custom arrow */
-        }
-        .select-wrapper select:focus {
-        background-color: var(--color-action-btn-bg);
-        color: var(--color-btn-text);
-        box-shadow: 0 0 0 3px rgba(93, 173, 226, 0.4);
-        }
-        /* When select is focused, the blue ::before pseudo-element blends in, and the white ::after arrow remains visible */
 
-        /* --- Social Media Inputs --- */
+        /* Social Media Inputs */
         .social-link-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
+            display: flex; gap: 10px; margin-bottom: 10px; align-items: center;
         }
         .social-input-wrapper {
-            flex-grow: 1;
-            display: flex;
-            border: 1px solid var(--border-color);
+            flex-grow: 1; display: flex;
+            border: 1px solid var(--input-border-color); /* Use new variable */
             border-radius: 8px;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .social-input-wrapper:focus-within {
-        border-color: var(--color-action-btn-bg);
-        box-shadow: 0 0 0 3px rgba(93, 173, 226, 0.2);
+            border-color: var(--color-action-btn-bg);
+            box-shadow: 0 0 0 3px rgba(93, 173, 226, 0.2);
         }
-        .social-input-wrapper .select-wrapper {
-            flex: 0 0 150px;
-        }
+        .social-input-wrapper .select-wrapper { flex: 0 0 150px; }
         .social-input-wrapper .select-wrapper select {
-            border-right: 1px solid var(--border-color);
+            border: none; /* Remove individual border */
+            border-right: 1px solid var(--input-border-color); /* Add separator */
             border-radius: 8px 0 0 8px;
             height: 100%;
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-        }
-        .social-input-wrapper .select-wrapper:hover {
-            transform: none; /* Disable hover scale inside this component */
         }
         .social-input-wrapper input {
-            border: none;
-            outline: none;
-            background-color: transparent;
-            padding: 12px 15px;
-            font-family: var(--font-family);
-            font-size: 15px;
-            width: 100%;
-            color: var(--text-dark);
+            border: none; outline: none; background-color: transparent;
+            padding: 12px 15px; font-family: var(--font-family);
+            font-size: 15px; width: 100%; color: var(--text-dark);
             border-radius: 0 8px 8px 0;
         }
         .btn-remove-social {
-            background: none; border: none;
-            color: var(--text-muted); cursor: pointer;
-            font-size: 1.2rem; font-weight: bold;
-            padding: 0 5px; transition: color 0.2s ease;
+            background: none; border: none; color: var(--text-muted); cursor: pointer;
+            font-size: 1.2rem; font-weight: bold; padding: 0 5px; transition: color 0.2s ease;
         }
         .btn-remove-social:hover { color: var(--color-discard-btn-bg); }
         
         .btn-add-social {
-        width: 100%; padding: 12px;
-        border: 2px dashed var(--border-dashed);
-        border-radius: 8px; background-color: transparent;
-        color: var(--text-muted); cursor: pointer;
-        font-size: 24px; line-height: 1;
-        transition: all 0.2s ease;
+            width: 100%; padding: 12px;
+            border: 2px dashed var(--border-dashed); border-radius: 8px;
+            background-color: transparent; color: var(--text-muted); cursor: pointer;
+            font-size: 24px; line-height: 1; transition: all 0.2s ease;
         }
         .btn-add-social:hover { background-color: var(--bg-input); color: var(--text-dark); border-color: var(--text-muted); }
-        
-        /* --- Mobile Header & Responsive Design (unchanged) --- */
-        .mobile-header { display: none; }
-        .mobile-header {
-        position: fixed; top: 0; left: 0; right: 0; z-index: 1030;
-        background-color: var(--bg-sidebar); color: var(--text-light);
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .mobile-navbar {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 12px 20px;
-        }
-        .mobile-navbar .logo-mobile { font-weight: 600; font-size: 20px; }
-        .menu-toggle { background: none; border: none; color: var(--text-light); font-size: 24px; }
-        .mobile-menu-body {
-        background-color: var(--bg-card); padding: 15px 20px;
-        border-top: 1px solid #dee2e6; display: none;
-        }
-        .mobile-menu-body a {
-        display: flex; align-items: center; padding: 12px 0;
-        text-decoration: none; color: var(--text-dark);
-        font-weight: 500; font-size: 16px; border-bottom: 1px solid #f1f3f5;
-        }
-        .mobile-menu-body a:last-of-type { border-bottom: none; }
-        .mobile-menu-body a i { margin-right: 15px; font-size: 22px; color: var(--text-muted); }
-        .logout-btn-mobile { width: 100%; margin-top: 15px; }
-        
-        @media (max-width: 991.98px) {
-        .sidebar { display: none; }
-        .mobile-header { display: block; }
-        .content { margin-left: 0; padding: 20px 15px; padding-top: 80px; }
-        .profile-card { padding: 25px; }
-        .form-header { margin-bottom: 30px; }
-        .form-header h2 { font-size: 24px; }
-        .form-row { flex-direction: column; gap: 0; }
-        .avatar-preview { width: 120px; height: 120px; font-size: 4rem; }
-        .social-input-wrapper .select-wrapper { flex: 0 0 120px; }
-        }
+
     </style>
-    </head>
-    <body>
-    
+</head>
+<body>
+
     <aside class="sidebar">
-        <div class="logo">Lost & Found</div>
+        <div class="logo">
+            <span class="full-text">Lost & Found</span>
+            <span class="minimized-text">L&F</span>
+        </div>
         <nav>
-        <a href="index.html"><i class="bi bi-house-door-fill"></i> Home</a>
-        <a href="profile.html" class="active"><i class="bi bi-person-fill"></i> Profile</a>
+            <a href="index.html"><i class="bi bi-house-door-fill"></i> <span>Home</span></a>
+            <a href="profile.html" class="active"><i class="bi bi-person-fill"></i> <span>Profile</span></a>
         </nav>
         <button class="logout-btn">Logout</button>
     </aside>
 
     <header class="mobile-header">
         <nav class="mobile-navbar">
-            <span class="logo-mobile">Lost & Found</span>
+            <span class="logo-mobile">Lost&Found</span>
             <button class="menu-toggle" id="menuToggle"><i class="bi bi-list"></i></button>
         </nav>
+        
         <div class="mobile-menu-body" id="mobileMenu">
             <a href="index.html"><i class="bi bi-house-door-fill"></i> Home</a>
-            <a href="profile.html"><i class="bi bi-person-fill"></i> Profile</a>
+            <a href="profile.html" class="active"><i class="bi bi-person-fill"></i> Profile</a>
             <button class="logout-btn logout-btn-mobile">Logout</button>
         </div>
     </header>
     
     <main class="content">
         <div class="profile-card">
-        <div class="form-header">
-            <h2>Profile Setting</h2>
-            <div class="action-buttons">
-            <button type="reset" form="profileForm" class="btn btn-discard">Discard</button>
-            <button type="submit" form="profileForm" class="btn btn-save">Save</button>
+            <div class="form-header">
+                <h2>Profile Setting</h2>
+                <div class="action-buttons">
+                    <button type="reset" form="profileForm" class="btn btn-discard">Discard</button>
+                    <button type="submit" form="profileForm" class="btn btn-save">Save</button>
+                </div>
             </div>
-        </div>
-        
-        <form id="profileForm">
-            <div class="profile-picture-section">
-                <div class="avatar-upload">
-                    <div class="avatar-preview">
-                        <img id="imagePreview" src="" style="display: none;" alt="Profile Preview" />
-                        <i class="bi bi-person-circle" id="imageIcon"></i>
+            
+            <form id="profileForm">
+                <div class="profile-picture-section">
+                    <div class="avatar-upload">
+                        <div class="avatar-preview">
+                            <img id="imagePreview" src="" style="display: none;" alt="Profile Preview" />
+                            <i class="bi bi-person-circle" id="imageIcon"></i>
+                        </div>
+                    </div>
+                    <div class="file-input-group">
+                        <label for="profilePictureInput" class="btn btn-select-file">Select file</label>
+                        <input type="file" id="profilePictureInput" accept=".png, .jpg, .jpeg">
+                        <div class="form-control-file-display" id="fileNameDisplay">Profile picture</div>
                     </div>
                 </div>
-                <div class="file-input-group">
-                    <label for="profilePictureInput" class="btn btn-select-file">Select file</label>
-                    <input type="file" id="profilePictureInput" accept=".png, .jpg, .jpeg">
-                    <div class="form-control-file-display" id="fileNameDisplay">Profile picture</div>
+                
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" class="form-control-custom" placeholder="Name Surname">
                 </div>
-            </div>
-            
-            <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" class="form-control-custom" placeholder="Name Surname">
-            </div>
-            
-            <div class="form-row">
-            <div class="form-group">
-                <label for="faculty">Faculty</label>
-                <div class="select-wrapper">
-                <select id="faculty" class="form-control-custom">
-                    <option selected>Select</option>
-                    <option value="1">School of Engineering</option>
-                    <option value="2">School of Architecture, Art, and Design</option>
-                    <option value="3">School of Industrial Education and Technology</option>
-                    <option value="4">School of Agricultural Technology</option>
-                    <option value="5">School of Science</option>
-                    <option value="6">School of Food Industry</option>
-                    <option value="7">School of Information Technology</option>
-                    <option value="8">International College</option>
-                    <option value="9">College of Materials Innovation and Technology</option>
-                    <option value="10">College of Advanced Manufacturing Innovation</option>
-                    <option value="11">KMITL Business School</option>
-                    <option value="12">International Academy of Aviation Industry</option>
-                    <option value="13">School of Liberal Arts</option>
-                    <option value="14">Faculty of Medicine</option>
-                    <option value="15">College of Innovation and Industrial Management</option>
-                    <option value="16">Institute of Music Science and Engineering</option>
-                    <option value="17">School of Dentistry</option>
-                    <option value="18">School of Nursing Science</option>
-                    <option value="19">School of Integrated Innovative Technology</option>
-                </select>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="faculty">Faculty</label>
+                        <div class="select-wrapper">
+                            <select id="faculty" class="form-control-custom">
+                                <option selected>Select</option>
+                                <option value="1">School of Engineering</option>
+                                <option value="2">School of Architecture, Art, and Design</option>
+                                <option value="3">School of Industrial Education and Technology</option>
+                                <option value="4">School of Agricultural Technology</option>
+                                <option value="5">School of Science</option>
+                                <option value="6">School of Food Industry</option>
+                                <option value="7">School of Information Technology</option>
+                                <option value="8">International College</option>
+                                <option value="9">College of Materials Innovation and Technology</option>
+                                <option value="10">College of Advanced Manufacturing Innovation</option>
+                                <option value="11">KMITL Business School</option>
+                                <option value="12">International Academy of Aviation Industry</option>
+                                <option value="13">School of Liberal Arts</option>
+                                <option value="14">Faculty of Medicine</option>
+                                <option value="15">College of Innovation and Industrial Management</option>
+                                <option value="16">Institute of Music Science and Engineering</option>
+                                <option value="17">School of Dentistry</option>
+                                <option value="18">School of Nursing Science</option>
+                                <option value="19">School of Integrated Innovative Technology</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="class-year">Class year</label>
+                        <input type="number" id="class-year" class="form-control-custom" placeholder="1" min="1" max="8">
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="class-year">Class year</label>
-                <input type="number" id="class-year" class="form-control-custom" placeholder="1" min="1" max="8">
-            </div>
-            </div>
 
-            <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" class="form-control-custom" placeholder="samplemail@gmail.com">
-            </div>
-            
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" class="form-control-custom" placeholder="e.g., 081-234-5678">
-            </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control-custom" placeholder="samplemail@gmail.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" class="form-control-custom" placeholder="e.g., 081-234-5678">
+                </div>
 
-            <div class="form-group">
-            <label>Link to social media account</label>
-            <div id="social-links-container"></div>
-            <button type="button" class="btn-add-social" id="addSocialLinkBtn">+</button>
-            </div>
-            
-        </form>
+                <div class="form-group">
+                    <label>Link to social media account</label>
+                    <div id="social-links-container"></div>
+                    <button type="button" class="btn-add-social" id="addSocialLinkBtn">+</button>
+                </div>
+                
+            </form>
         </div>
     </main>
     
@@ -493,7 +502,6 @@
             function createSocialLinkGroup() {
                 const div = document.createElement('div');
                 div.className = 'social-link-group';
-                // UPDATED HTML: Added select-wrapper to the JS template
                 div.innerHTML = `
                     <div class="social-input-wrapper">
                         <div class="select-wrapper">
@@ -512,9 +520,7 @@
                 socialLinksContainer.appendChild(div);
 
                 div.querySelector('.btn-remove-social').addEventListener('click', function() {
-                    if (socialLinksContainer.childElementCount > 1) {
-                        this.parentElement.remove();
-                    }
+                    this.parentElement.remove();
                 });
             }
             
@@ -541,10 +547,9 @@
 
             function resetSocialLinks() {
                 socialLinksContainer.innerHTML = '';
-                createSocialLinkGroup();
             }
-
-            createSocialLinkGroup();
+            
+            createSocialLinkGroup(); 
         });
     </script>
 
