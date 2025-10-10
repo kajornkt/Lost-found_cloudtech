@@ -226,11 +226,44 @@
                 });
             }
 
+            // --- Clear Search Bar Logic (from previous step) ---
+            const clearButton = document.getElementById('clear-addon');
+            const searchInput = document.querySelector('.d-none.d-md-flex .custom-search-input');
+            const clearButtonMobile = document.getElementById('clear-addon-mobile');
+            const searchInputMobile = document.querySelector('.mobile-search-bar .custom-search-input');
+
+            if (clearButton && searchInput) {
+                clearButton.addEventListener('click', () => {
+                    searchInput.value = '';
+                    searchInputMobile.value = ''; // NEW: Clear mobile input too
+                    applyFilters(); // NEW: Re-apply filters after clearing
+                });
+            }
+            if (clearButtonMobile && searchInputMobile) {
+                clearButtonMobile.addEventListener('click', () => {
+                    searchInputMobile.value = '';
+                    searchInput.value = ''; // NEW: Clear desktop input too
+                    applyFilters(); // NEW: Re-apply filters after clearing
+                });
+            }
+
+            // --- Filter Buttons Logic ---
             const lostButton = document.getElementById('btn-filter-lost');
             const foundButton = document.getElementById('btn-filter-found');
             const posts = document.querySelectorAll('#post-grid .col');
 
+            // NEW: Add event listeners to search inputs to trigger filtering on keyup
+            searchInput.addEventListener('keyup', () => {
+                searchInputMobile.value = searchInput.value; // Sync the two inputs
+                applyFilters();
+            });
+            searchInputMobile.addEventListener('keyup', () => {
+                searchInput.value = searchInputMobile.value; // Sync the two inputs
+                applyFilters();
+            });
+
             function applyFilters() {
+                // Get active category filter
                 let activeMainFilter = 'All'; 
                 if (lostButton.classList.contains('active')) {
                     activeMainFilter = 'Lost';
@@ -238,11 +271,25 @@
                     activeMainFilter = 'Found';
                 }
                 
+                // Get the current search term and convert to lowercase
+                const searchTerm = searchInput.value.toLowerCase();
+                
                 posts.forEach(post => {
+                    // Check category match
                     const postMainCategory = post.getAttribute('data-category');
                     const matchesMainFilter = activeMainFilter === 'All' || postMainCategory === activeMainFilter;
 
-                    if (matchesMainFilter) {
+                    // --- Start: Modified search logic ---
+                    const postTitle = post.querySelector('.card-title').textContent.toLowerCase();
+                    // NEW: Get the user's name from the post
+                    const postAuthor = post.querySelector('.card-text.mb-1').textContent.toLowerCase();
+
+                    // A post matches if the search term is in the title OR the author's name
+                    const matchesSearch = postTitle.includes(searchTerm) || postAuthor.includes(searchTerm);
+                    // --- End: Modified search logic ---
+
+                    // A post is shown only if it matches BOTH the category AND the search term
+                    if (matchesMainFilter && matchesSearch) {
                         post.style.display = 'block';
                     } else {
                         post.style.display = 'none';
@@ -257,14 +304,12 @@
                     clickedButton.classList.add('active');
                     otherButton.classList.remove('active');
                 }
-
                 applyFilters();
             }
 
             lostButton.addEventListener('click', () => {
                 handleMainFilterClick(lostButton, foundButton);
             });
-
             foundButton.addEventListener('click', () => {
                 handleMainFilterClick(foundButton, lostButton);
             });
