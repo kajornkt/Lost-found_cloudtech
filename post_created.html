@@ -1,274 +1,381 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Post - Lost & Found</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  
-  <style>
-    :root {
-      --font-family: 'Gabarito', sans-serif; /* FONT CHANGED */
-      --bg-main: #f8f9fa;
-      --bg-card: #ffffff;
-      --bg-sidebar: #2c3e50;
-      --bg-input: #f1f3f5;
-      --color-post-btn-bg: #66d9b3;
-      --color-post-btn-text: #ffffff;
-      --color-action-btn-bg: #5dade2;
-      --color-action-btn-text: #ffffff;
-      --color-lost-bg: #F7D47A;
-      --color-lost-text: #B68439;
-      --color-found-bg: #21D0B3;
-      --color-found-text: #29382E;
-      --text-dark: #343a40;
-      --text-light: #ffffff;
-      --text-muted: #6c757d;
-      --border-color: #dee2e6;
-      --danger: #e74c3c;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background-color: var(--bg-main); font-family: var(--font-family); }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Post - Lost & Found</title>
     
-    .sidebar { width: 280px; background-color: var(--bg-sidebar); color: var(--text-light); display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; padding: 40px 30px; }
-    .sidebar .logo { font-size: 28px; font-weight: 700; margin-bottom: 60px; }
-    .sidebar nav { flex: 1; }
-    .sidebar nav a { color: var(--text-light); text-decoration: none; display: flex; align-items: center; padding: 16px; margin-bottom: 15px; border-radius: 12px; font-size: 18px; font-weight: 500; transition: background-color 0.3s ease; }
-    .sidebar nav a i { margin-right: 20px; font-size: 28px; width: 30px; }
-    .sidebar nav a:hover { background-color: rgba(255, 255, 255, 0.1); }
-    .logout-btn { background-color: var(--color-action-btn-bg); color: var(--color-action-btn-text); padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 16px; margin-top: auto; }
-    .content { margin-left: 280px; flex: 1; padding: 50px; }
-    .form-card { background: var(--bg-card); padding: 50px; width: 100%; max-width: 1100px; margin: 0 auto; border-radius: 24px; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06); }
-    .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; }
-    .form-card h2 { font-size: 36px; font-weight: 700; color: var(--text-dark); }
-    .post-btn { background-color: var(--color-post-btn-bg); color: var(--color-post-btn-text); padding: 14px 50px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 16px; transition: opacity 0.3s ease; }
-    .post-btn:hover { opacity: 0.9; }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    .form-content { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: stretch; }
-    .right-section { display: flex; flex-direction: column; gap: 12px; }
-    .image-uploader { display: flex; flex-direction: column; flex-grow: 1; min-height: 0; }
-    .form-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-    .left-section .form-group:last-child { margin-bottom: 0; }
-    .form-group label, .right-section > label { font-weight: 600; color: var(--text-dark); font-size: 17px; }
-    .category-buttons { display: flex; gap: 15px; }
-    .category-btn { padding: 12px 35px; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-main); color: var(--text-muted); cursor: pointer; font-size: 15px; font-weight: 600; transition: all 0.3s ease; }
-    .category-btn.active.lost { background-color: var(--color-lost-bg); color: var(--color-lost-text); border-color: var(--color-lost-bg); }
-    .category-btn.active.found { background-color: var(--color-found-bg); color: var(--color-found-text); border-color: var(--color-found-bg); }
-    .form-control-custom { width: 100%; padding: 16px 20px; border: 1px solid var(--bg-input); border-radius: 12px; background-color: var(--bg-input); font-size: 15px; color: var(--text-dark); font-family: var(--font-family); transition: border-color 0.3s ease, box-shadow 0.3s ease; }
-    .form-control-custom:focus { outline: none; background-color: var(--bg-card); border-color: var(--color-action-btn-bg); box-shadow: 0 0 0 4px rgba(93, 173, 226, 0.2); }
-    textarea.form-control-custom { resize: none; height: 160px; }
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    .main-preview-area { flex-grow: 1; min-height: 0; width: 100%; background-color: var(--bg-input); border: 2px dashed var(--border-color); border-radius: 16px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; }
-    .main-preview-area img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
-    .main-preview-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%; /* Makes sure it fills the dashed box */
-  text-align: center;
-  color: var(--text-muted);
-}
+    <style>
+        /* --- Root Variables --- */
+        :root {
+            --font-family: 'Gabarito', sans-serif;
+            --bg-main: #f8f9fa;
+            --bg-card: #ffffff;
+            --bg-sidebar: #2c3e50;
+            --bg-input: #f1f3f5;
+            --color-post-btn-bg: #66d9b3;
+            --color-post-btn-text: #ffffff;
+            --color-action-btn-bg: #5dade2;
+            --color-btn-text: #ffffff; /* Renamed for consistency */
+            --color-lost-bg: #F7D47A;
+            --color-lost-text: #B68439;
+            --color-found-bg: #21D0B3;
+            --color-found-text: #29382E;
+            --text-dark: #343a40;
+            --text-light: #ffffff;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --danger: #e74c3c;
+        }
 
-.main-preview-placeholder i {
-  font-size: 44px;
-  margin-bottom: 15px;
-  color: var(--color-action-btn-bg);
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-main);
+            font-family: var(--font-family);
+            overflow-x: hidden;
+        }
+        
+        /* --- Sidebar & Layout (From Profile Page) --- */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-sidebar);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            padding: 40px 30px;
+            z-index: 1000;
+            transition: width 0.3s ease, padding 0.3s ease;
+        }
+        .sidebar .logo {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 60px;
+            overflow: hidden;
+            height: 34px;
+        }
+        .sidebar .logo .minimized-text { display: none; }
+        .sidebar nav { flex: 1; }
+        .sidebar nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        .sidebar nav a i { margin-right: 20px; font-size: 26px; width: 30px; }
+        .sidebar nav a span { transition: opacity 0.1s ease; }
+        .sidebar nav a:hover, .sidebar nav a.active { background-color: rgba(255, 255, 255, 0.1); }
+        .logout-btn {
+            background-color: var(--color-action-btn-bg);
+            color: var(--color-btn-text);
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: auto;
+            text-align: center;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        /* --- Mobile Header (From Profile Page) --- */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            background-color: var(--bg-sidebar);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .mobile-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-light);
+        }
+        .mobile-navbar .logo-mobile { font-weight: 600; font-size: 20px; }
+        .menu-toggle { background: none; border: none; color: var(--text-light); font-size: 24px; }
+        .mobile-menu-body {
+            background-color: var(--bg-card);
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        .mobile-menu-body a {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 16px;
+            border-bottom: 1px solid #f1f3f5;
+        }
+        .mobile-menu-body a:last-of-type { border-bottom: none; }
+        .mobile-menu-body a i { margin-right: 15px; font-size: 22px; color: var(--text-muted); }
+        .logout-btn-mobile { width: 100%; margin-top: 15px; }
 
-.main-preview-placeholder p {
-  font-weight: 600;
-  color: var(--text-dark);
-  font-size: 18px;
-  margin-bottom: 5px; /* Add a little space */
-}
+        /* --- Main Content Container --- */
+        .content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 50px;
+            transition: margin-left 0.3s ease, width 0.3s ease;
+        }
 
-/* This is the missing style for the subtext */
-.main-preview-placeholder span {
-    font-size: 13px;
-    margin-bottom: 20px;
-}
+        /* --- Styles for Create Post Form (Unchanged) --- */
+        .form-card { background: var(--bg-card); padding: 50px; width: 100%; max-width: 1100px; margin: 0 auto; border-radius: 24px; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06); }
+        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; }
+        .form-card h2 { font-size: 36px; font-weight: 700; color: var(--text-dark); }
+        .post-btn { background-color: var(--color-post-btn-bg); color: var(--color-post-btn-text); padding: 14px 50px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 16px; transition: opacity 0.3s ease; }
+        .post-btn:hover { opacity: 0.9; }
+        .form-content { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: stretch; }
+        .right-section { display: flex; flex-direction: column; gap: 12px; }
+        .image-uploader { display: flex; flex-direction: column; flex-grow: 1; min-height: 0; }
+        .form-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+        .left-section .form-group:last-child { margin-bottom: 0; }
+        .form-group label, .right-section > label { font-weight: 600; color: var(--text-dark); font-size: 17px; }
+        .category-buttons { display: flex; gap: 15px; }
+        .category-btn { padding: 12px 35px; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-main); color: var(--text-muted); cursor: pointer; font-size: 15px; font-weight: 600; transition: all 0.3s ease; }
+        .category-btn.active.lost { background-color: var(--color-lost-bg); color: var(--color-lost-text); border-color: var(--color-lost-bg); }
+        .category-btn.active.found { background-color: var(--color-found-bg); color: var(--color-found-text); border-color: var(--color-found-bg); }
+        .form-control-custom { width: 100%; padding: 16px 20px; border: 1px solid var(--bg-input); border-radius: 12px; background-color: var(--bg-input); font-size: 15px; color: var(--text-dark); font-family: var(--font-family); transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+        .form-control-custom:focus { outline: none; background-color: var(--bg-card); border-color: var(--color-action-btn-bg); box-shadow: 0 0 0 4px rgba(93, 173, 226, 0.2); }
+        textarea.form-control-custom { resize: none; height: 160px; }
+        .main-preview-area { flex-grow: 1; min-height: 0; width: 100%; background-color: var(--bg-input); border: 2px dashed var(--border-color); border-radius: 16px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; }
+        .main-preview-area img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
+        .main-preview-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: var(--text-muted); }
+        .main-preview-placeholder i { font-size: 44px; margin-bottom: 15px; color: var(--color-action-btn-bg); }
+        .main-preview-placeholder p { font-weight: 600; color: var(--text-dark); font-size: 18px; margin-bottom: 5px; }
+        .main-preview-placeholder span { font-size: 13px; margin-bottom: 20px; }
+        .select-file-btn { background-color: var(--color-action-btn-bg); color: var(--color-btn-text); padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .thumbnail-container { flex-shrink: 0; background-color: var(--bg-input); border-radius: 16px; padding: 15px; margin-top: 20px; display: none; }
+        .thumbnail-gallery { display: flex; gap: 12px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 5px; }
+        .thumbnail-gallery::-webkit-scrollbar { height: 8px; }
+        .thumbnail-gallery::-webkit-scrollbar-track { background: transparent; }
+        .thumbnail-gallery::-webkit-scrollbar-thumb { background-color: #ced4da; border-radius: 10px; }
+        .thumbnail-item, .add-more-btn { min-width: 80px; height: 80px; border-radius: 12px; cursor: pointer; position: relative; flex-shrink: 0; }
+        .thumbnail-item { border: 2px solid #ced4da; overflow: hidden; background-color: var(--bg-card); }
+        .thumbnail-item img { width: 100%; height: 100%; object-fit: contain; }
+        .thumbnail-item.active { border-color: var(--color-action-btn-bg); }
+        .delete-image-btn { position: absolute; top: 4px; right: 4px; background-color: rgba(0, 0, 0, 0.6); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; line-height: 20px; text-align: center; opacity: 0; transition: opacity 0.2s; }
+        .thumbnail-item:hover .delete-image-btn { opacity: 1; }
+        .add-more-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--border-color); font-size: 24px; border: 2px dashed var(--border-color); transition: all 0.2s ease; }
+        .add-more-btn:hover { background-color: var(--bg-input); border-color: #ced4da; color: var(--text-muted); }
+        
+        /* Responsive Media Queries */
+        @media (max-width: 1100px) and (min-width: 992px) {
+            .sidebar { width: 90px; padding: 40px 0; }
+            .sidebar .logo .full-text { display: none; }
+            .sidebar .logo .minimized-text { display: block; text-align: center; }
+            .sidebar nav a span { opacity: 0; pointer-events: none; width: 1px; }
+            .sidebar nav a { padding: 16px 30px; justify-content: center; }
+            .sidebar nav a i { margin-right: 0; }
+            .logout-btn { height: 50px; padding: 0; border-radius: 12px; width: 50px; margin: 0 auto; font-size: 0; overflow: hidden; }
+            .logout-btn::before { content: '\F444'; font-family: 'bootstrap-icons'; font-size: 1rem; display: block; margin: auto; padding: 14px 0; }
+            .content { margin-left: 90px; }
+        }
 
-.select-file-btn {
-  background-color: var(--color-action-btn-bg);
-  color: var(--color-action-btn-text);
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-    .thumbnail-container { flex-shrink: 0; background-color: var(--bg-input); border-radius: 16px; padding: 15px; margin-top: 20px; display: none; }
-    .thumbnail-gallery { display: flex; gap: 12px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 5px; }
-    .thumbnail-gallery::-webkit-scrollbar { height: 8px; }
-    .thumbnail-gallery::-webkit-scrollbar-track { background: transparent; }
-    .thumbnail-gallery::-webkit-scrollbar-thumb { background-color: #ced4da; border-radius: 10px; }
-    .thumbnail-item, .add-more-btn { min-width: 80px; height: 80px; border-radius: 12px; cursor: pointer; position: relative; flex-shrink: 0; }
-    .thumbnail-item { border: 2px solid #ced4da; overflow: hidden; background-color: var(--bg-card); }
-    .thumbnail-item img { width: 100%; height: 100%; object-fit: contain; }
-    .thumbnail-item.active { border-color: var(--color-action-btn-bg); }
-    .delete-image-btn { position: absolute; top: 4px; right: 4px; background-color: rgba(0, 0, 0, 0.6); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; line-height: 20px; text-align: center; opacity: 0; transition: opacity 0.2s; }
-    .thumbnail-item:hover .delete-image-btn { opacity: 1; }
-    .add-more-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--border-color); font-size: 24px; border: 2px dashed var(--border-color); transition: all 0.2s ease; }
-    .add-more-btn:hover { background-color: var(--bg-input); border-color: #ced4da; color: var(--text-muted); }
-
-    .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 1030; background-color: var(--bg-sidebar); color: var(--text-light); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .mobile-navbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
-    .mobile-navbar .logo-mobile { font-weight: 600; font-size: 20px; }
-    .mobile-menu-body { background-color: var(--bg-card); padding: 15px 20px; border-top: 1px solid #dee2e6; }
-    .mobile-menu-body a { display: flex; align-items: center; padding: 12px 0; text-decoration: none; color: var(--text-dark); font-weight: 500; font-size: 16px; border-bottom: 1px solid #f1f3f5; }
-    .mobile-menu-body a:last-of-type { border-bottom: none; }
-    .mobile-menu-body a i { margin-right: 15px; font-size: 22px; color: var(--text-muted); }
-    .logout-btn-mobile { width: 100%; margin-top: 15px; background-color: var(--color-action-btn-bg); color: var(--text-light); padding: 12px; border: none; border-radius: 8px; font-weight: 600; }
-    
-    /* ### MEDIA QUERY FROM YOUR FILE ### */
-    @media (max-width: 991.98px) {
-      .sidebar { display: none; }
-      .mobile-header { display: block; }
-      /* PADDING FOR POST BUTTON ADDED */
-      .content { margin-left: 0; padding: 20px 15px; padding-top: 90px; padding-bottom: 100px; }
-      .form-card { padding: 25px; border-radius: 20px; }
-      .form-content { grid-template-columns: 1fr; align-items: stretch; } /* Stack to single column */
-      .right-section { gap: 20px; } /* Adjust gap for mobile stacking */
-      .main-preview-area { height: 250px; flex-grow: 0; } /* Give a fixed height on mobile */
-      
-      
-      /* ### POST BUTTON ADDED HERE ### */
-      .post-btn { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; border-radius: 0; z-index: 1000; padding: 18px; box-shadow: 0 -5px 15px rgba(0,0,0,0.08); }
-      
-      .thumbnail-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 12px; }
-    }
-  </style>
+        @media (max-width: 991.98px) {
+            .sidebar { display: none; }
+            .mobile-header { display: block; }
+            .content { margin-left: 0; padding: 20px 15px; padding-top: 90px; padding-bottom: 100px; }
+            .form-card { padding: 25px; border-radius: 20px; }
+            .form-content { grid-template-columns: 1fr; }
+            .right-section { gap: 20px; }
+            .main-preview-area { height: 250px; flex-grow: 0; }
+            .post-btn { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; border-radius: 0; z-index: 1000; padding: 18px; box-shadow: 0 -5px 15px rgba(0,0,0,0.08); }
+            .thumbnail-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); }
+        }
+    </style>
 </head>
 <body>
-  
-    <aside class="sidebar d-none d-lg-flex">
-      <h2 class="logo">Lost & Found</h2>
-      <nav>
-        <a href="index.html"><i class="bi bi-house-door-fill"></i>Home</a>
-        <a href="profile.html"><i class="bi bi-person-circle"></i>Profile</a>
-      </nav>
-      <button class="logout-btn">Logout</button>
-    </aside>
-    <header class="mobile-header d-lg-none">
-      <nav class="mobile-navbar">
-        <button class="btn text-white fs-2 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenuCollapse">
-          <i class="bi bi-list"></i>
-        </button>
-        <span class="logo-mobile">Lost & Found</span>
-        <div style="width: 30px;"></div>
-      </nav>
-      <div class="collapse" id="mobileMenuCollapse">
-        <div class="mobile-menu-body">
-          <a href="index.html"><i class="bi bi-house-door-fill"></i>Home</a>
-          <a href="profile.html"><i class="bi bi-person-circle"></i>Profile</a>
-          <button class="logout-btn-mobile">Logout</button>
+    
+    <aside class="sidebar">
+        <div class="logo">
+            <span class="full-text">Lost & Found</span>
+            <span class="minimized-text">L&F</span>
         </div>
-      </div>
+        <nav>
+            <a href="index.html"><i class="bi bi-house-door-fill"></i> <span>Home</span></a>
+            <a href="profile.html"><i class="bi bi-person-fill"></i> <span>Profile</span></a>
+        </nav>
+        <button class="logout-btn">Logout</button>
+    </aside>
+
+    <header class="mobile-header">
+        <nav class="mobile-navbar">
+            <span class="logo-mobile">Lost&Found</span>
+            <button class="menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenuCollapse">
+                <i class="bi bi-list"></i>
+            </button>
+        </nav>
+        <div class="collapse" id="mobileMenuCollapse">
+            <div class="mobile-menu-body">
+                <a href="index.html"><i class="bi bi-house-door-fill"></i> Home</a>
+                <a href="profile.html"><i class="bi bi-person-fill"></i> Profile</a>
+                <button class="logout-btn logout-btn-mobile">Logout</button>
+            </div>
+        </div>
     </header>
 
-
     <main class="content">
-      <div class="form-card">
-        <div class="form-header">
-          <h2>Create Post</h2>
-          <button type="submit" class="post-btn" form="createPostForm">Post</button>
-        </div>
-        <form id="createPostForm">
-          <div class="form-content">
-            <div class="left-section">
-              <div class="form-group"><label>Category</label><div class="category-buttons"><button type="button" class="category-btn active lost" data-category="lost">Lost</button><button type="button" class="category-btn found" data-category="found">Found</button></div></div>
-              <div class="form-group"><label for="itemName">Item's name</label><input type="text" id="itemName" class="form-control-custom" required /></div>
-              <div class="form-group"><label for="itemPlace">Place</label><input type="text" id="itemPlace" class="form-control-custom" required /></div>
-              <div class="form-group"><label for="itemDetails">Details</label><textarea id="itemDetails" class="form-control-custom" required></textarea></div>
+        <div class="form-card">
+            <div class="form-header">
+                <h2>Create Post</h2>
+                <button type="submit" class="post-btn" form="createPostForm">Post</button>
             </div>
-            
-            <div class="right-section">
-                <label>Item's picture</label>
-                <div class="image-uploader">
-                  <div class="main-preview-area" id="mainPreviewArea">
-                    <div class="main-preview-placeholder" id="mainPreviewPlaceholder">
-                      <i class="bi bi-cloud-arrow-up-fill"></i>
-                      <p>Choose file type to upload</p>
-                      <span>JPEG, PNG, PDF up to 50MB</span>
-                      
-                      <button type="button" class="select-file-btn">Select file</button>
+            <form id="createPostForm">
+                <div class="form-content">
+                    <div class="left-section">
+                        <div class="form-group"><label>Category</label><div class="category-buttons"><button type="button" class="category-btn active lost" data-category="lost">Lost</button><button type="button" class="category-btn found" data-category="found">Found</button></div></div>
+                        <div class="form-group"><label for="itemName">Item's name</label><input type="text" id="itemName" class="form-control-custom" required /></div>
+                        <div class="form-group"><label for="itemPlace">Place</label><input type="text" id="itemPlace" class="form-control-custom" required /></div>
+                        <div class="form-group"><label for="itemDetails">Details</label><textarea id="itemDetails" class="form-control-custom" required></textarea></div>
                     </div>
-                  </div>
-                  <div class="thumbnail-container" id="thumbnailContainer">
-                    <div class="thumbnail-gallery" id="thumbnailGallery"></div>
-                  </div>
+                    
+                    <div class="right-section">
+                        <label>Item's picture</label>
+                        <div class="image-uploader">
+                            <div class="main-preview-area" id="mainPreviewArea">
+                                <div class="main-preview-placeholder" id="mainPreviewPlaceholder">
+                                    <i class="bi bi-cloud-arrow-up-fill"></i>
+                                    <p>Choose file type to upload</p>
+                                    <span>JPEG, PNG, PDF up to 50MB</span>
+                                    <button type="button" class="select-file-btn">Select file</button>
+                                </div>
+                            </div>
+                            <div class="thumbnail-container" id="thumbnailContainer">
+                                <div class="thumbnail-gallery" id="thumbnailGallery"></div>
+                            </div>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*" multiple class="d-none" />
+                    </div>
                 </div>
-                <input type="file" id="fileInput" accept="image/*" multiple class="d-none" />
-            </div>
-          </div>
-        </form>
-      </div>
+            </form>
+        </div>
     </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const fileInput = document.getElementById('fileInput');
-    const mainPreviewArea = document.getElementById('mainPreviewArea');
-    const mainPreviewPlaceholder = document.getElementById('mainPreviewPlaceholder');
-    const thumbnailContainer = document.getElementById('thumbnailContainer');
-    const thumbnailGallery = document.getElementById('thumbnailGallery');
-    const form = document.getElementById('createPostForm');
-    const selectFileBtn = document.querySelector('.select-file-btn');
-    let uploadedFiles = [], activeImageIndex = 0;
-    function renderImages() {
-      thumbnailGallery.innerHTML = '';
-      if (uploadedFiles.length === 0) { mainPreviewArea.innerHTML = ''; mainPreviewArea.appendChild(mainPreviewPlaceholder); thumbnailContainer.style.display = 'none'; activeImageIndex = 0; }
-      else { mainPreviewPlaceholder.remove(); thumbnailContainer.style.display = 'block'; }
-      uploadedFiles.forEach((file, index) => {
-        const thumbnailUrl = URL.createObjectURL(file);
-        const thumbWrapper = document.createElement('div');
-        thumbWrapper.className = 'thumbnail-item';
-        if (index === activeImageIndex) { thumbWrapper.classList.add('active'); }
-        thumbWrapper.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail ${index + 1}"><button type="button" class="delete-image-btn" data-index="${index}">&times;</button>`;
-        thumbWrapper.addEventListener('click', () => setActiveImage(index));
-        thumbnailGallery.appendChild(thumbWrapper);
-      });
-      const addMoreBtn = document.createElement('div');
-      addMoreBtn.className = 'add-more-btn';
-      addMoreBtn.innerHTML = `<i class="bi bi-plus"></i>`;
-      addMoreBtn.addEventListener('click', () => fileInput.click());
-      thumbnailGallery.appendChild(addMoreBtn);
-      document.querySelectorAll('.delete-image-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => { e.stopPropagation(); deleteImage(parseInt(e.currentTarget.dataset.index)); });
-      });
-      if (uploadedFiles.length > 0) { updateMainPreview(); }
-    }
-    mainPreviewArea.addEventListener('click', () => fileInput.click());
-    selectFileBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent clicking placeholder from also triggering mainPreviewArea
-        fileInput.click();
-    });
-    fileInput.addEventListener('change', (e) => addFiles(e.target.files));
-    function setActiveImage(index) { activeImageIndex = index; renderImages(); }
-    function updateMainPreview() { if (uploadedFiles.length === 0) return; const activeFile = uploadedFiles[activeImageIndex]; const previewUrl = URL.createObjectURL(activeFile); mainPreviewArea.innerHTML = `<img src="${previewUrl}" alt="Main preview">`; }
-    function addFiles(newFiles) { Array.from(newFiles).forEach(file => uploadedFiles.push(file)); activeImageIndex = uploadedFiles.length - 1; renderImages(); }
-    function deleteImage(index) { uploadedFiles.splice(index, 1); if (activeImageIndex >= uploadedFiles.length) { activeImageIndex = uploadedFiles.length - 1; } if (activeImageIndex < 0) activeImageIndex = 0; renderImages(); }
-    mainPreviewArea.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => addFiles(e.target.files));
-    document.addEventListener('DOMContentLoaded', renderImages);
-    document.querySelectorAll('.category-btn').forEach(btn => {
-      btn.addEventListener('click', () => { document.querySelector('.category-btn.active').classList.remove('active'); btn.classList.add('active'); });
-    });
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (form.checkValidity()) { alert(`Post created successfully with ${uploadedFiles.length} image(s)!`); }
-      else { form.reportValidity(); }
-    });
-  </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // SCRIPT FOR FORM (UNCHANGED)
+        const fileInput = document.getElementById('fileInput');
+        const mainPreviewArea = document.getElementById('mainPreviewArea');
+        const mainPreviewPlaceholder = document.getElementById('mainPreviewPlaceholder');
+        const thumbnailContainer = document.getElementById('thumbnailContainer');
+        const thumbnailGallery = document.getElementById('thumbnailGallery');
+        const form = document.getElementById('createPostForm');
+        const selectFileBtn = document.querySelector('.select-file-btn');
+        let uploadedFiles = [], activeImageIndex = 0;
+        
+        function renderImages() {
+            thumbnailGallery.innerHTML = '';
+            if (uploadedFiles.length === 0) { 
+                mainPreviewArea.innerHTML = ''; 
+                mainPreviewArea.appendChild(mainPreviewPlaceholder); 
+                thumbnailContainer.style.display = 'none'; 
+                activeImageIndex = 0; 
+            } else { 
+                if (document.body.contains(mainPreviewPlaceholder)) {
+                    mainPreviewPlaceholder.remove();
+                }
+                thumbnailContainer.style.display = 'block'; 
+            }
+            uploadedFiles.forEach((file, index) => {
+                const thumbnailUrl = URL.createObjectURL(file);
+                const thumbWrapper = document.createElement('div');
+                thumbWrapper.className = 'thumbnail-item';
+                if (index === activeImageIndex) { thumbWrapper.classList.add('active'); }
+                thumbWrapper.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail ${index + 1}"><button type="button" class="delete-image-btn" data-index="${index}">&times;</button>`;
+                thumbWrapper.addEventListener('click', () => setActiveImage(index));
+                thumbnailGallery.appendChild(thumbWrapper);
+            });
+            const addMoreBtn = document.createElement('div');
+            addMoreBtn.className = 'add-more-btn';
+            addMoreBtn.innerHTML = `<i class="bi bi-plus"></i>`;
+            addMoreBtn.addEventListener('click', () => fileInput.click());
+            thumbnailGallery.appendChild(addMoreBtn);
+            document.querySelectorAll('.delete-image-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    deleteImage(parseInt(e.currentTarget.dataset.index)); 
+                });
+            });
+            if (uploadedFiles.length > 0) { updateMainPreview(); }
+        }
+
+        mainPreviewArea.addEventListener('click', () => fileInput.click());
+        selectFileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+        fileInput.addEventListener('change', (e) => addFiles(e.target.files));
+        
+        function setActiveImage(index) { 
+            activeImageIndex = index; 
+            renderImages(); 
+        }
+        
+        function updateMainPreview() { 
+            if (uploadedFiles.length === 0) return; 
+            const activeFile = uploadedFiles[activeImageIndex]; 
+            const previewUrl = URL.createObjectURL(activeFile); 
+            mainPreviewArea.innerHTML = `<img src="${previewUrl}" alt="Main preview">`; 
+        }
+        
+        function addFiles(newFiles) { 
+            Array.from(newFiles).forEach(file => uploadedFiles.push(file)); 
+            activeImageIndex = uploadedFiles.length - 1; 
+            renderImages(); 
+        }
+        
+        function deleteImage(index) { 
+            uploadedFiles.splice(index, 1); 
+            if (activeImageIndex >= uploadedFiles.length) { 
+                activeImageIndex = uploadedFiles.length - 1; 
+            } 
+            if (activeImageIndex < 0) activeImageIndex = 0; 
+            renderImages(); 
+        }
+        
+        document.addEventListener('DOMContentLoaded', renderImages);
+        
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => { 
+                document.querySelector('.category-btn.active').classList.remove('active'); 
+                btn.classList.add('active'); 
+            });
+        });
+        
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (form.checkValidity()) { 
+                alert(`Post created successfully with ${uploadedFiles.length} image(s)!`); 
+            } else { 
+                form.reportValidity(); 
+            }
+        });
+    </script>
 </body>
 </html>
