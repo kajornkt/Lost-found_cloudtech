@@ -1,77 +1,174 @@
-html, body {
-    height: 100%;
+:root {
+    --gradient-start: #3FE5B8; /* Teal-green */
+    --gradient-end: #00A9FF;   /* Bright blue */
+    --card-bg-color: #FFFFFF;
+    --card-shadow-color: rgba(0, 0, 0, 0.1);
+    --input-bg-color: #F0F0F0;
+    --input-border-color: #E0E0E0;
+    --primary-button-color: #00A9FF;
+    --primary-button-hover-color: #008fdb;
+    --link-color: #00A9FF;
+    --subtitle-color: #2F455C;
 }
 
-/* The left panel background color (only visible on desktop) */
-.custom-bg-left {
-    background-color: #e9e9e9; 
-    color: #000;
-    min-height: 100vh; /* Full viewport height on desktop */
+body {
+    font-family: Arial, sans-serif;
+    color: var(subtitle-color);
 }
 
-/* Ensure the Lost & Found text is large and bold (Desktop view) */
-.custom-bg-left h1 {
-    font-size: 5rem;
+.custom-gradient-bg {
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
 }
 
-/* Form container to control the width. 
-    On mobile, this max-width helps center the form in the middle.
-*/
-.form-container {
-    max-width: 400px; 
-    width: 100%;
-    text-align: left; 
+.custom-left-section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Mobile-specific styling for the right panel (form) */
-.col-12.bg-white {
-    border-radius: 0;
-    padding-top: 5rem !important;
+.custom-brand-logo {
+    font-size: 2.5rem; 
+    color: white;
 }
 
-
-/* Media Query for Desktop (Medium screen and up) */
-@media (min-width: 768px) {
-    .container-fluid {
-        min-height: 100vh; /* Full height on desktop */
-    }
-    
-    .col-md-6.bg-white {
-        min-height: 100vh; /* Full height on desktop */
-    }
-
-    body {
-        background-color: #fff; /* Reset body background on desktop */
-    }
+.custom-slogan {
+    font-size: 2.2rem; 
+    line-height: 1.3;
+    color: white;
 }
 
+.custom-right-section {
+    min-height: 50vh; 
+}
 
-/* Custom button styling for the light grey Login button */
-.custom-btn-login {
-    background-color: #dcdcdc; 
+.custom-card {
     border: none;
-    color: #000;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px var(--card-shadow-color);
+    width: 100%;
+    max-width: 70vh 
+}
+
+.custom-form-control {
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--input-border-color);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+}
+
+.custom-form-control::placeholder {
+    color: #888;
+}
+
+.custom-link-text {
+    color: var(--link-color);
+    font-size: 0.9rem;
+}
+
+.custom-link-text:hover {
+    text-decoration: underline !important;
+    color: var(--link-color);
+}
+
+/* --- Sign Up Specific Styles --- */
+
+/* Social Account "Add" Button */
+.custom-add-social-btn {
+    color: var(--text-color);
+    border: 1px solid var(--input-border-color);
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+.custom-add-social-btn:hover {
+    background-color: var(--input-bg-color);
+}
+
+/* Create New Account Button (Primary button style) */
+.custom-create-account-btn {
+    background-color: var(--primary-button-color);
+    border-color: var(--primary-button-color);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
     font-weight: bold;
-    padding: 0.75rem 1.5rem; 
-    border-radius: 0.5rem; 
-    transition: background-color 0.3s;
 }
 
-.custom-btn-login:hover {
-    background-color: #c9c9c9;
-    color: #000;
+.custom-create-account-btn:hover {
+    background-color: var(--primary-button-hover-color);
+    border-color: var(--primary-button-hover-color);
+    color: white;
 }
 
-/* Style for the links */
-.custom-link-color {
-    color: #000;
+/* Sign In Link styling for the small text at the bottom */
+.custom-sign-in-link {
+    font-size: 1rem;
+    font-weight: 500;
 }
 
-.custom-link-color:hover {
-    color: #555;
+
+/* Responsive Adjustments */
+@media (min-width: 768px) {
+    .custom-right-section {
+        min-height: 100vh; 
+    }
+    .custom-left-section {
+        justify-content: center; 
+    }
+    .custom-slogan {
+        font-size: 2.8rem;
+    }
+    .custom-brand-logo {
+        font-size: 3rem;
+    }
 }
 
-/* Input fields */
-.custom-input {
-    padding: 0.75rem 0.5rem; 
+@media (max-width: 767.98px) {
+    .custom-left-section {
+        text-align: center;
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+    .custom-slogan {
+        font-size: 1.8rem; 
+    }
+    .custom-brand-logo {
+        font-size: 2rem;
+    }
+    .custom-right-section {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+    .custom-card {
+        padding: 2rem !important;
+    }
+}
+
+/* DELETE THESE RULES from register.css */
+
+.input-group .custom-form-control-prepend {
+    /* Use the same styling as other inputs */
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--input-border-color);
+    padding: 0.75rem 1rem;
+    
+    /* KEEP the LEFT radius (8px) and REMOVE the RIGHT radius (0) */
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    
+    /* Ensure the left side has the standard radius */
+    border-top-left-radius: 8px !important; 
+    border-bottom-left-radius: 8px !important; 
+}
+
+.input-group .custom-form-control {
+    /* KEEP the RIGHT radius (8px) and REMOVE the LEFT radius (0) */
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    
+    /* Ensure the right side has the standard radius */
+    border-top-right-radius: 8px !important; 
+    border-bottom-right-radius: 8px !important; 
 }
