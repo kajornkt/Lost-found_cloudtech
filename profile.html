@@ -10,21 +10,59 @@
   <link rel="stylesheet" href="global.css">
 
   <style>
-      .profile-pic {
-          width: 80px; 
-          height: 80px;
-          border-radius: 50%;
-          object-fit: cover;
-      }
-      .custom-list-item {
-          border: 1px solid #e9ecef;
-          border-radius: 0.5rem;
-          background-color: var(--bg-card, #ffffff);
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      }
-      .custom-status-select {
-          min-width: 100px;
-      }
+        .profile-pic {
+            width: 80px; 
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .custom-list-item {
+            border: 1px solid #e9ecef;
+            border-radius: 0.5rem;
+            background-color: var(--bg-card, #ffffff);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .custom-status-select {
+            min-width: 100px;
+        }
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            border-radius: 50%;
+            border: 6px solid #f8f8f8;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        }
+        .avatar-preview > img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .custom-badge-lost { 
+            background-color: #F7D47A; 
+            color: #905512; 
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        .custom-badge-found {
+            background-color: #3ad4ba;
+            color: #29382E; 
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        .profile-setting-btn {
+            background-color: #21D0B3;
+            color: #ffffff;
+        }
+        .profile-setting-btn:hover {
+            background-color: #99e6d9;
+            color: #ffffff;
+        }
   </style>
 </head>
 <body>
@@ -60,13 +98,15 @@
                     <div class="card p-4 mb-4 shadow-sm">
                         <div class="d-flex flex-column flex-md-row align-items-center justify-content-between text-center text-md-start">
                             <div class="d-flex flex-column flex-md-row align-items-center">
-                                <img src="pic/profile.png" class="img-fluid me-md-4 mb-3 mb-md-0 profile-pic" alt="Profile Picture">
+                                <div class="avatar-preview me-md-4 mb-3 mb-md-0">
+                                    <img src="pic/profile.png" alt="Profile Picture">
+                                </div>
                                 <div>
                                     <h3 class="fw-bold mb-0">[Name Surname]</h3>
                                     <p class="text-muted mb-0">[Faculty], [Class year]</p>
                                 </div>
                             </div>
-                            <a href="profile_setting.html" class="btn btn-outline-secondary mt-3 mt-md-0">
+                            <a href="profile_setting.html" class="btn profile-setting-btn mt-3 mt-md-0">
                                 Profile Setting
                             </a>
                         </div>
@@ -75,42 +115,38 @@
                     <h4 class="mb-3 fw-bold">My Posts</h4>
                     <div class="item-list mt-4">
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-3 mb-2 custom-list-item">
-                            <span class="fw-medium mb-2 mb-md-0">[Item's name 1]</span>
+                            <div class="d-flex align-items-start">
+                                <span class="fw-medium mb-2 mb-md-0">[Item's name 1]</span>
+                                <span class="badge custom-badge-lost ms-2">Lost</span>
+                            </div>
                             <div class="d-flex align-items-center mt-2 mt-md-0">
-                                <select class="form-select form-select-sm me-2 custom-status-select">
-                                    <option selected>Status</option>
-                                    <option value="1">Lost</option>
-                                    <option value="2">Found</option>
-                                    <option value="3">Returned</option>
-                                </select>
+                                <button class="btn btn-sm btn-outline-secondary me-2">View Details</button>
                                 <button class="btn btn-sm btn-outline-secondary me-2">Edit</button>
-                                <div class="dropdown">
+                                <div class="dropdown mx-2 align-items-center">
                                     <button class="btn btn-sm btn-light p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v fa-lg"></i>
+                                        <i class="fas fa-ellipsis-v fa-lg m-2"></i>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">View Details</a></li>
+                                        <li><a class="dropdown-item" href="#">Founded</a></li>
                                         <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-3 mb-2 custom-list-item">
-                            <span class="fw-medium mb-2 mb-md-0">[Item's name 2]</span>
+                            <div class="d-flex align-items-start">
+                                <span class="fw-medium mb-2 mb-md-0">[Item's name 1]</span>
+                                <span class="badge custom-badge-found ms-2">Found</span>
+                            </div>
                             <div class="d-flex align-items-center mt-2 mt-md-0">
-                                <select class="form-select form-select-sm me-2 custom-status-select">
-                                    <option>Status</option>
-                                    <option value="1" selected>Lost</option>
-                                    <option value="2">Found</option>
-                                    <option value="3">Returned</option>
-                                </select>
+                                <button class="btn btn-sm btn-outline-secondary me-2">View Details</button>
                                 <button class="btn btn-sm btn-outline-secondary me-2">Edit</button>
-                                <div class="dropdown">
+                                <div class="dropdown mx-2 align-items-center">
                                     <button class="btn btn-sm btn-light p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v fa-lg"></i>
+                                        <i class="fas fa-ellipsis-v fa-lg m-2"></i>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">View Details</a></li>
+                                        <li><a class="dropdown-item" href="#">Returned</a></li>
                                         <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
                                     </ul>
                                 </div>
