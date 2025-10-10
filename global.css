@@ -27,9 +27,9 @@ body {
     min-height: 100vh;
 }
 
-/* --- Sidebar (Desktop) --- */
+/* --- Sidebar (Desktop - DEFAULT 280px) --- */
 .sidebar {
-    width: 280px;
+    width: 280px; /* Default width for Laptops and above */
     background-color: var(--bg-sidebar);
     color: var(--text-light);
     display: flex;
@@ -40,8 +40,18 @@ body {
     left: 0;
     padding: 40px 30px;
     z-index: 1000;
+    transition: width 0.3s ease, padding 0.3s ease; /* Add transition for smoothness */
 }
-.sidebar .logo { font-size: 28px; font-weight: 700; margin-bottom: 60px; }
+.sidebar .logo { 
+    font-size: 28px; 
+    font-weight: 700; 
+    margin-bottom: 60px; 
+    overflow: hidden; 
+    height: 34px;
+}
+.sidebar .logo .minimized-text {
+    display: none; /* Hidden by default */
+}
 .sidebar nav { flex: 1; }
 .sidebar nav a {
     color: var(--text-light);
@@ -56,6 +66,9 @@ body {
     transition: background-color 0.3s ease;
 }
 .sidebar nav a i { margin-right: 20px; font-size: 26px; width: 30px; }
+.sidebar nav a span {
+    transition: opacity 0.1s ease;
+}
 .sidebar nav a:hover, .sidebar nav a.active { background-color: rgba(255, 255, 255, 0.1); }
 .logout-btn {
     background-color: var(--color-action-btn-bg);
@@ -69,6 +82,7 @@ body {
     margin-top: auto;
     text-align: center;
     width: 100%;
+    transition: all 0.3s ease; /* Transition all properties */
 }
 
 /* --- Mobile Header & Responsive Design --- */
@@ -111,29 +125,78 @@ body {
 .mobile-menu-body a i { margin-right: 15px; font-size: 22px; color: var(--text-muted); }
 .logout-btn-mobile { width: 100%; margin-top: 15px; }
 
-
 /* --- Main Content Container (Desktop) --- */
 .content {
-    /* Desktop Default: Margin to clear the fixed 280px sidebar */
     margin-left: 280px; 
-    width: calc(100% - 280px); /* Ensures the div only takes up the remaining width */
+    width: calc(100% - 280px); 
     overflow-y: visible;
+    transition: margin-left 0.3s ease, width 0.3s ease; 
 }
 
-@media (min-width: 768px) {
-    /* Overwrite fixed for mobile header on desktop */
-    .mobile-header { 
-        display: none !important; 
+/* ========================================================== */
+/* SHRINK BEHAVIOR (Max width 1100px, Min width 768px)        */
+/* ========================================================== */
+@media (max-width: 1100px) and (min-width: 768px) {
+    
+    .sidebar {
+        width: 90px; /* Shrink sidebar width */
+        padding: 40px 0; /* Reduce padding for vertical-only space */
     }
+    
+    /* Show only the minimized logo (L&F) */
+    .sidebar .logo .full-text {
+        display: none;
+    }
+    .sidebar .logo .minimized-text {
+        display: block;
+        text-align: center;
+    }
+    
+    /* Hide the text content of navigation links */
+    .sidebar nav a span {
+        opacity: 0; 
+        pointer-events: none;
+        width: 1px;
+    }
+    
+    /* Reposition and size navigation links for icon-only display */
+    .sidebar nav a {
+        padding: 16px 30px; /* Center the icon horizontally */
+        justify-content: center;
+    }
+    .sidebar nav a i {
+        margin-right: 0; /* Remove icon margin */
+    }
+    
+    /* Shrink Logout Button to an ICON-ONLY square */
+    .logout-btn {
+        height: 50px; 
+        padding: 0;
+        border-radius: 12px; 
+        width: 50px;
+        margin: 0 auto;
+        font-size: 0; /* Hide 'Logout' text */
+        overflow: hidden;
+    }
+    .logout-btn::before {
+        content: '\F444'; /* Unicode for Bootstrap Icon 'box-arrow-right' */
+        font-family: 'bootstrap-icons';
+        font-size: 1rem;
+        display: block;
+        margin: auto;
+        padding: 14px 0; /* Center icon vertically */
+    }
+
+    /* Shift the main content to clear the smaller sidebar */
     .content {
-        margin-left: 280px; 
-        width: calc(100% - 280px); /* Re-assert width property */
-        min-height: 100vh;
-        overflow-y: visible;
+        margin-left: 90px;
+        width: calc(100% - 90px);
     }
 }
 
-
+/* ========================================================== */
+/* Mobile View (Max width 767.98px) - Sidebar is hidden       */
+/* ========================================================== */
 @media (max-width: 767.98px) {
     .sidebar { display: none; }
     .mobile-header { 
@@ -149,9 +212,15 @@ body {
         overflow-y: visible; 
     }
     
-    /* Content wrapper needs top padding to clear the fixed mobile header (approx 50px) */
+    /* FIX: Create Post Button vertical sizing */
+    .custom-btn-create {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.95rem;
+    }
+
     .content > .flex-grow-1 > div {
-        padding-top: 55px !important; /* Adjusted for no search bar in profile mobile view */
+        /* Unified padding for tallest mobile header (index.html) */
+        padding-top: 110px !important; 
         padding-left: 15px;
         padding-right: 15px;
         padding-bottom: 20px;
