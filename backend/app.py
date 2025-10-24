@@ -385,6 +385,76 @@ async def get_post_details(post_id: int):
         cursor.close()
         db.close()
 
+# ========== POST UPDATE & DELETE ROUTES ==========
+@app.put("/posts/{post_id}")
+async def update_post(post_id: int, post_update: PostUpdate):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    
+    try:
+        # Build update query dynamically based on provided fields
+        update_fields = []
+        update_values = []
+        
+        if post_update.item_name is not None:
+            update_fields.append("item_name = %s")
+            update_values.append(post_update.item_name)
+        
+        if post_update.description is not None:
+            update_fields.append("description = %s")
+            update_values.append(post_update.description)
+        
+        if post_update.item_status is not None:
+            update_fields.append("item_status = %s")
+            update_values.append(post_update.item_status)
+        
+        if post_update.place is not None:
+            update_fields.append("place = %s")
+            update_values.append(post_update.place)
+        
+        if not update_fields:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        update_values.append(post_id)
+        
+        query = f"UPDATE posts SET {', '.join(update_fields)}, updated_at = CURRENT_TIMESTAMP WHERE post_id = %s"
+        cursor.execute(query, update_values)
+        db.commit()
+        
+        return {"success": True, "message": "Post updated successfully"}
+        
+    except mysql.connector.Error as err:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {err}")
+    finally:
+        cursor.close()
+        db.close()
+
+@app.delete("/posts/{post_id}")
+async def delete_post(post_id: int):
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        # Delete post images first (due to foreign key constraint)
+        cursor.execute("DELETE FROM post_images WHERE post_id = %s", (post_id,))
+        
+        # Delete the post
+        cursor.execute("DELETE FROM posts WHERE post_id = %s", (post_id,))
+        db.commit()
+        
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Post not found")
+        
+        return {"success": True, "message": "Post deleted successfully"}
+        
+    except mysql.connector.Error as err:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {err}")
+    finally:
+        cursor.close()
+        db.close()
+
 # ========== FILE UPLOAD ROUTE ==========
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):

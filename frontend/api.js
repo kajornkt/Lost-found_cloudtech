@@ -75,4 +75,21 @@ class LostFoundAPI {
     static async getUserProfile(studentId) {
         return this.request(`/users/${studentId}`);
     }
+    
+    // Add to your existing LostFoundAPI class in api.js
+
+    // Update post status
+    static async updatePostStatus(postId, statusData) {
+    return this.request(`/posts/${postId}`, {
+        method: 'PUT',
+        body: JSON.stringify(statusData)
+    });
+    }
+
+    // Delete post
+    static async deletePost(postId) {
+        return this.request(`/posts/${postId}`, {
+            method: 'DELETE'
+        });
+    }
 }

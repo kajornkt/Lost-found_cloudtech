@@ -161,8 +161,9 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    <script src="api.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', async () => {
             const menuToggle = document.getElementById('menuToggle');
             const mobileMenu = document.getElementById('mobileMenu');
             
@@ -171,7 +172,182 @@
                     mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
                 });
             }
+
+            // Add logout functionality
+            document.querySelectorAll('.logout-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('isLoggedIn');
+                    window.location.href = 'signin.html';
+                });
+            });
+
+            // Check if user is logged in
+            const userData = localStorage.getItem('user');
+            if (!userData) {
+                // Redirect to login if not logged in
+                window.location.href = 'signin.html';
+                return;
+            }
+
+            const currentUser = JSON.parse(userData);
+            const studentId = currentUser.student_id;
+
+            console.log('Current user:', currentUser);
+            console.log('Student ID:', studentId);
+
+            // Load user profile and posts
+            async function loadProfile() {
+                try {
+                    // Load user profile from backend
+                    const userProfile = await LostFoundAPI.getUserProfile(studentId);
+                    console.log('User profile:', userProfile);
+                    displayUserProfile(userProfile);
+                    
+                    // Load user posts
+                    const userPosts = await LostFoundAPI.getUserPosts(studentId);
+                    console.log('User posts:', userPosts);
+                    displayUserPosts(userPosts.posts || []);
+                    
+                } catch (error) {
+                    console.error('Failed to load profile:', error);
+                    // Show user data from localStorage as fallback
+                    displayUserProfile(currentUser);
+                    document.querySelector('.item-list').innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="bi bi-inbox" style="font-size: 2rem; color: #6c757d;"></i>
+                            <p class="mt-2 text-muted">You haven't created any posts yet.</p>
+                            <a href="post_created.html" class="btn profile-setting-btn">Create Your First Post</a>
+                        </div>
+                    `;
+                }
+            }
+
+            function displayUserProfile(profile) {
+                // Update profile information
+                const profileImage = document.querySelector('.avatar-preview img');
+                if (profile.profile_photo_url) {
+                    profileImage.src = profile.profile_photo_url;
+                } else {
+                    profileImage.src = 'pic/profile.png'; // Default image
+                }
+                
+                document.querySelector('h3.fw-bold').textContent = profile.full_name || profile.name || '[Name Surname]';
+                document.querySelector('.text-muted.mb-0').textContent = 
+                    `${profile.faculty || '[Faculty]'}, Year ${profile.class_year || '[Class year]'}`;
+            }
+
+            function displayUserPosts(posts) {
+                const itemList = document.querySelector('.item-list');
+                
+                if (!posts || posts.length === 0) {
+                    itemList.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="bi bi-inbox" style="font-size: 2rem; color: #6c757d;"></i>
+                            <p class="mt-2 text-muted">You haven't created any posts yet.</p>
+                            <a href="post_created.html" class="btn profile-setting-btn">Create Your First Post</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                itemList.innerHTML = '';
+                
+                posts.forEach(post => {
+                    const postElement = `
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-3 mb-2 custom-list-item" data-post-id="${post.post_id}">
+                            <div class="d-flex align-items-start">
+                                <span class="fw-medium mb-2 mb-md-0">${post.item_name}</span>
+                                <span class="badge ${post.item_status === 'lost' ? 'custom-badge-lost' : post.item_status === 'found' ? 'custom-badge-found' : 'bg-secondary'} ms-2">
+                                    ${post.item_status}
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-center mt-2 mt-md-0">
+                                <a href="item_details.html?id=${post.post_id}" class="btn btn-sm btn-outline-secondary me-2">View Details</a>
+                                <a href="edit_post.html?id=${post.post_id}" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
+                                <div class="dropdown mx-2 align-items-center">
+                                    <button class="btn btn-sm btn-light p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v fa-lg m-2"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        ${getStatusOptions(post.item_status)}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger delete-post" href="#" data-post-id="${post.post_id}">Delete</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    itemList.innerHTML += postElement;
+                });
+
+                // Add event listeners for status changes and deletion
+                attachPostEventListeners();
+            }
+
+            function getStatusOptions(currentStatus) {
+                const statusOptions = {
+                    'lost': ['found', 'returned'],
+                    'found': ['returned'],
+                    'returned': [] // No status changes for returned items
+                };
+
+                const options = statusOptions[currentStatus] || [];
+                
+                return options.map(status => `
+                    <li><a class="dropdown-item change-status" href="#" data-status="${status}">Mark as ${status.charAt(0).toUpperCase() + status.slice(1)}</a></li>
+                `).join('');
+            }
+
+            function attachPostEventListeners() {
+                // Status change event
+                document.querySelectorAll('.change-status').forEach(button => {
+                    button.addEventListener('click', async function(e) {
+                        e.preventDefault();
+                        const postElement = this.closest('[data-post-id]');
+                        const postId = postElement.dataset.postId;
+                        const newStatus = this.dataset.status;
+                        
+                        try {
+                            await LostFoundAPI.updatePostStatus(postId, { item_status: newStatus });
+                            // Reload posts to reflect changes
+                            loadProfile();
+                        } catch (error) {
+                            console.error('Failed to update post status:', error);
+                            alert('Failed to update post status. Please try again.');
+                        }
+                    });
+                });
+
+                // Delete post event
+                document.querySelectorAll('.delete-post').forEach(button => {
+                    button.addEventListener('click', async function(e) {
+                        e.preventDefault();
+                        const postId = this.dataset.postId;
+                        
+                        if (confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+                            try {
+                                await LostFoundAPI.deletePost(postId);
+                                // Remove the post element from UI
+                                this.closest('[data-post-id]').remove();
+                                
+                                // Check if no posts left
+                                const remainingPosts = document.querySelectorAll('[data-post-id]');
+                                if (remainingPosts.length === 0) {
+                                    displayUserPosts([]);
+                                }
+                            } catch (error) {
+                                console.error('Failed to delete post:', error);
+                                alert('Failed to delete post. Please try again.');
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Load profile when page loads
+            loadProfile();
         });
-    </script>
+        </script>
 </body>
 </html>
