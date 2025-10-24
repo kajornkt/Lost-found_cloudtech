@@ -2,154 +2,136 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
+import mysql.connector
 import json
-from database import init_db, get_db_connection
 
-app = FastAPI()
+# Initialize app
+app = FastAPI(title="Lost&Found API")
 
-# Allow frontend to connect
+# CORS setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins for development
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Import database functions
+from database import get_db, init_database
+
 # Data models
 class SocialLink(BaseModel):
-    type: str
-    link: str
+    platform: str
+    url: str
 
-class UserSignUp(BaseModel):
-    name: str
+class UserCreate(BaseModel):
+    full_name: str
     faculty: str
     class_year: str
     phone: str
     email: str
     password: str
     confirm_password: str
-    social_links: List[SocialLink] = []
+    social_profiles: List[SocialLink] = []
 
-class UserSignIn(BaseModel):
+class UserLogin(BaseModel):
     email: str
     password: str
 
 # Initialize database on startup
 @app.on_event("startup")
 def startup():
-    init_db()
+    init_database()
 
-# Routes
+# API Routes
 @app.get("/")
-def read_root():
-    return {"message": "Lost&Found Backend is running with SQLite!"}
+def api_status():
+    return {"status": "active", "service": "Lost&Found API", "database": "MySQL"}
 
-@app.post("/api/signup")
-def signup(user: UserSignUp):
-    # Check if passwords match
+@app.post("/auth/register")
+async def register_user(user: UserCreate):
+    # Validate passwords match
     if user.password != user.confirm_password:
-        raise HTTPException(status_code=400, detail="Passwords do not match")
+        raise HTTPException(status_code=400, detail="Password confirmation does not match")
     
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    db = get_db()
+    cursor = db.cursor()
     
     try:
         # Check if email already exists
-        cursor.execute("SELECT id FROM users WHERE email = ?", (user.email,))
+        cursor.execute("SELECT id FROM users WHERE email = %s", (user.email,))
         if cursor.fetchone():
-            raise HTTPException(status_code=400, detail="Email already registered")
+            raise HTTPException(status_code=400, detail="Email address already registered")
         
-        # Insert new user
+        # Create new user
         cursor.execute('''
-            INSERT INTO users (name, faculty, class_year, phone, email, password, social_links)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO users (full_name, faculty, class_year, phone, email, password, social_profiles)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         ''', (
-            user.name,
-            user.faculty, 
+            user.full_name,
+            user.faculty,
             user.class_year,
             user.phone,
             user.email,
             user.password,  # In production, hash this!
-            json.dumps([link.dict() for link in user.social_links])
+            json.dumps([profile.dict() for profile in user.social_profiles])
         ))
         
-        conn.commit()
-        user_id = cursor.lastrowid
+        db.commit()
+        return {"success": True, "message": "Account created successfully", "user_email": user.email}
         
-        return {
-            "message": "User created successfully", 
-            "user": {
-                "id": user_id,
-                "name": user.name, 
-                "email": user.email
-            }
-        }
-        
-    except Exception as e:
-        conn.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+    except mysql.connector.Error as err:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {err}")
     finally:
-        conn.close()
+        cursor.close()
+        db.close()
 
-@app.post("/api/signin")
-def signin(user: UserSignIn):
-    conn = get_db_connection()
-    cursor = conn.cursor()
+@app.post("/auth/login")
+async def login_user(credentials: UserLogin):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
     
     try:
         cursor.execute('''
-            SELECT id, name, email, faculty, password, social_links 
-            FROM users WHERE email = ?
-        ''', (user.email,))
+            SELECT id, full_name, email, faculty, password 
+            FROM users WHERE email = %s
+        ''', (credentials.email,))
         
-        db_user = cursor.fetchone()
+        user = cursor.fetchone()
         
-        if db_user and db_user['password'] == user.password:
+        if user and user['password'] == credentials.password:
             return {
+                "success": True,
                 "message": "Login successful",
-                "user": {
-                    "id": db_user['id'],
-                    "name": db_user['name'],
-                    "email": db_user['email'],
-                    "faculty": db_user['faculty']
+                "user_data": {
+                    "user_id": user['id'],
+                    "name": user['full_name'],
+                    "email": user['email'],
+                    "faculty": user['faculty']
                 }
             }
         
         raise HTTPException(status_code=401, detail="Invalid email or password")
         
     finally:
-        conn.close()
+        cursor.close()
+        db.close()
 
-@app.get("/api/users")
-def get_users():
-    """Get all users (for testing)"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
+@app.get("/users")
+async def get_all_users():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
     
     try:
-        cursor.execute('''
-            SELECT id, name, email, faculty, class_year, phone, created_at 
-            FROM users
-        ''')
+        cursor.execute("SELECT id, full_name, email, faculty, class_year FROM users")
         users = cursor.fetchall()
-        return [dict(user) for user in users]
+        return {"users": users, "count": len(users)}
     finally:
-        conn.close()
-
-@app.get("/api/users/count")
-def get_users_count():
-    """Get total number of users"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        cursor.execute("SELECT COUNT(*) as count FROM users")
-        result = cursor.fetchone()
-        return {"total_users": result['count']}
-    finally:
-        conn.close()
+        cursor.close()
+        db.close()
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
