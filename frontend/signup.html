@@ -1,4 +1,3 @@
-// sign up //
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,7 +67,7 @@
 
                     <div class="mb-3">
                         <label for="phoneInput" class="form-label">Phone</label>
-                        <input type="phone" class="form-control custom-form-control" id="phoneInput" placeholder="0XX XXX XXXX">
+                        <input type="tel" class="form-control custom-form-control" id="phoneInput" placeholder="0XX XXX XXXX">
                     </div>
 
                     <div class="mb-3">
@@ -114,6 +113,83 @@
         const addSocialLinkBtn = document.getElementById('addSocialLinkBtn');
         const socialLinksContainer = document.getElementById('social-links-container');
         const profileForm = document.querySelector('form');
+
+        // Phone number validation function
+        function validatePhoneNumber(phone) {
+            // Remove any spaces for validation
+            const cleanPhone = phone.replace(/\s/g, '');
+            
+            // Check if it starts with 0 and has exactly 10 digits
+            const phoneRegex = /^0\d{9}$/;
+            return phoneRegex.test(cleanPhone);
+        }
+
+        // Format phone number as user types (0XX XXX XXXX)
+        function formatPhoneNumber(input) {
+            let value = input.value.replace(/\D/g, ''); // Remove non-digits
+            
+            // Ensure it starts with 0
+            if (value.length > 0 && value[0] !== '0') {
+                value = '0' + value;
+            }
+            
+            // Limit to 10 digits
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            
+            // Format as 0XX XXX XXXX
+            if (value.length > 3 && value.length <= 6) {
+                value = value.replace(/(\d{3})(\d{0,3})/, '$1 $2');
+            } else if (value.length > 6) {
+                value = value.replace(/(\d{3})(\d{3})(\d{0,4})/, '$1 $2 $3');
+            }
+            
+            input.value = value;
+        }
+
+        // Add real-time phone number formatting and validation
+        document.getElementById('phoneInput').addEventListener('input', function() {
+            formatPhoneNumber(this);
+            
+            // Real-time validation styling
+            const phone = this.value.trim();
+            if (phone && !validatePhoneNumber(phone)) {
+                this.style.borderColor = 'red';
+                // Show hint text
+                if (!document.getElementById('phoneHint')) {
+                    const hint = document.createElement('small');
+                    hint.id = 'phoneHint';
+                    hint.className = 'text-danger mt-1';
+                    hint.textContent = 'Phone must start with 0 and have 10 digits (0XX XXX XXXX)';
+                    this.parentNode.appendChild(hint);
+                }
+            } else {
+                this.style.borderColor = '';
+                const hint = document.getElementById('phoneHint');
+                if (hint) hint.remove();
+            }
+        });
+
+        // Prevent non-numeric input (except spaces which we handle in formatting)
+        document.getElementById('phoneInput').addEventListener('keydown', function(e) {
+            // Allow: backspace, delete, tab, escape, enter, arrows
+            if ([46, 8, 9, 27, 13, 110, 190].includes(e.keyCode) || 
+                // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                (e.keyCode === 65 && e.ctrlKey === true) || 
+                (e.keyCode === 67 && e.ctrlKey === true) ||
+                (e.keyCode === 86 && e.ctrlKey === true) ||
+                (e.keyCode === 88 && e.ctrlKey === true) ||
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                return;
+            }
+            
+            // Ensure that it is a number and stop the keypress if not
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
 
         // Add social link functionality
         addSocialLinkBtn.addEventListener('click', () => {
@@ -209,8 +285,15 @@
                 return false;
             }
 
+            // Phone validation
             if (!phone) {
                 alert('Please enter your phone number.');
+                document.getElementById('phoneInput').focus();
+                return false;
+            }
+            
+            if (!validatePhoneNumber(phone)) {
+                alert('Please enter a valid phone number starting with 0 and containing exactly 10 digits (0XX XXX XXXX).');
                 document.getElementById('phoneInput').focus();
                 return false;
             }
@@ -353,6 +436,5 @@
         resetSocialLinks();
     });
     </script>
-</script>
 </body>
 </html>

@@ -303,187 +303,303 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="api.js"></script>
     <script>
-        // SCRIPT FOR FORM (UNCHANGED)
+    document.addEventListener('DOMContentLoaded', async () => {
+        const fileInput = document.getElementById('fileInput');
+        const mainPreviewArea = document.getElementById('mainPreviewArea');
+        const mainPreviewPlaceholder = document.getElementById('mainPreviewPlaceholder');
+        const thumbnailContainer = document.getElementById('thumbnailContainer');
+        const thumbnailGallery = document.getElementById('thumbnailGallery');
+        const editPostForm = document.getElementById('editPostForm');
+        const discardBtn = document.getElementById('discardBtn');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const itemNameInput = document.getElementById('itemName');
+        const itemPlaceInput = document.getElementById('itemPlace');
+        const itemDetailsTextarea = document.getElementById('itemDetails');
+        const selectFileBtn = document.querySelector('.select-file-btn');
+
         let uploadedFiles = [];
         let activeImageIndex = 0;
-        let originalPostData = {};
+        let originalPostData = null;
 
-        const post_db = {
-            'post123': { 
-                name: 'Wallet', 
-                category: 'Lost', 
-                place: 'Central Library', 
-                description: 'A black leather wallet, lost near the main entrance on Friday afternoon. Contains student ID.', 
-                images: [ 
-                    'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=2070&auto=format&fit=crop', 
-                    'https://images.unsplash.com/photo-1613948338319-1970b84231db?q=80&w=1974&auto=format&fit=crop' 
-                ] 
-            }
-        };
+        // Check if user is logged in
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+            window.location.href = 'signin.html';
+            return;
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        const currentUser = JSON.parse(userData);
+
+        // Add logout functionality
+        document.querySelectorAll('.logout-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                localStorage.removeItem('user');
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = 'signin.html';
+            });
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+
+        if (!postId) {
+            showError('Post ID not provided');
+            return;
+        }
+
+        // Load post data
+        try {
+            const post = await LostFoundAPI.getPostDetails(postId);
             
-            const fileInput = document.getElementById('fileInput');
-            const mainPreviewArea = document.getElementById('mainPreviewArea');
-            const mainPreviewPlaceholder = document.getElementById('mainPreviewPlaceholder');
-            const thumbnailContainer = document.getElementById('thumbnailContainer');
-            const thumbnailGallery = document.getElementById('thumbnailGallery');
-            const editPostForm = document.getElementById('editPostForm');
-            const discardBtn = document.getElementById('discardBtn');
-            const categoryBtns = document.querySelectorAll('.category-btn');
-            const itemNameInput = document.getElementById('itemName');
-            const itemPlaceInput = document.getElementById('itemPlace');
-            const itemDetailsTextarea = document.getElementById('itemDetails');
-            const selectFileBtn = document.querySelector('.select-file-btn');
-
-            function loadPostData(postId) {
-                const post = post_db[postId];
-                if (post) {
-                    originalPostData = JSON.parse(JSON.stringify(post));
-                    resetForm();
-                } else {
-                    const formCard = document.querySelector('.form-card');
-                    formCard.innerHTML = `
-                        <h2 class="text-center text-danger">Post Not Found</h2>
-                        <p class="text-center mt-3">The post you are trying to edit does not exist.</p>
-                        <div class="text-center mt-4">
-                            <a href="index.html" class="btn btn-primary">Return to Homepage</a>
-                        </div>
-                    `;
-                }
+            // Check if current user owns this post
+            if (post.student_id !== currentUser.student_id) {
+                showError('You can only edit your own posts');
+                return;
             }
-        
-            function resetForm() {
-                if (originalPostData) {
-                    itemNameInput.value = originalPostData.name;
-                    itemPlaceInput.value = originalPostData.place;
-                    itemDetailsTextarea.value = originalPostData.description;
 
-                    categoryBtns.forEach(btn => {
-                        btn.classList.remove('active', 'lost', 'found');
-                        if (btn.dataset.category.toLowerCase() === originalPostData.category.toLowerCase()) {
-                            btn.classList.add('active', originalPostData.category.toLowerCase());
+            originalPostData = { ...post };
+            populateForm(post);
+        } catch (error) {
+            console.error('Failed to load post:', error);
+            showError('Failed to load post. Please check if the post exists.');
+        }
+
+        function populateForm(post) {
+            itemNameInput.value = post.item_name;
+            itemPlaceInput.value = post.place;
+            itemDetailsTextarea.value = post.description;
+
+            // Set category
+            categoryBtns.forEach(btn => {
+                btn.classList.remove('active', 'lost', 'found');
+                if (btn.dataset.category.toLowerCase() === post.item_status.toLowerCase()) {
+                    btn.classList.add('active', post.item_status.toLowerCase());
+                }
+            });
+
+            // Load images
+            if (post.images && post.images.length > 0) {
+                uploadedFiles = post.images.map(url => ({ 
+                    type: 'url', 
+                    src: url, 
+                    objectURL: url.startsWith('http') ? url : `http://localhost:8000${url}`
+                }));
+                activeImageIndex = 0;
+            }
+            
+            renderImages();
+        }
+
+        function renderImages() {
+            thumbnailGallery.innerHTML = '';
+            if (uploadedFiles.length === 0) { 
+                mainPreviewArea.innerHTML = ''; 
+                mainPreviewArea.appendChild(mainPreviewPlaceholder); 
+                thumbnailContainer.style.display = 'none'; 
+                activeImageIndex = -1; 
+            } else { 
+                if (mainPreviewPlaceholder.parentNode === mainPreviewArea) { 
+                    mainPreviewPlaceholder.remove(); 
+                } 
+                thumbnailContainer.style.display = 'block'; 
+                
+                uploadedFiles.forEach((fileEntry, index) => { 
+                    const thumbWrapper = document.createElement('div'); 
+                    thumbWrapper.className = 'thumbnail-item'; 
+                    if (index === activeImageIndex) { thumbWrapper.classList.add('active'); } 
+                    thumbWrapper.innerHTML = `<img src="${fileEntry.objectURL}" alt="Thumbnail ${index + 1}"><button type="button" class="delete-image-btn" data-index="${index}">&times;</button>`; 
+                    thumbWrapper.addEventListener('click', () => setActiveImage(index)); 
+                    thumbnailGallery.appendChild(thumbWrapper); 
+                }); 
+                
+                const addMoreBtn = document.createElement('div'); 
+                addMoreBtn.className = 'add-more-btn'; 
+                addMoreBtn.innerHTML = `<i class="bi bi-plus"></i>`; 
+                addMoreBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); }); 
+                thumbnailGallery.appendChild(addMoreBtn); 
+                
+                document.querySelectorAll('.delete-image-btn').forEach(btn => { 
+                    btn.addEventListener('click', (e) => { e.stopPropagation(); deleteImage(parseInt(e.currentTarget.dataset.index)); }); 
+                }); 
+                
+                updateMainPreview(); 
+            }
+        }
+        
+        function setActiveImage(index) { 
+            activeImageIndex = index; 
+            renderImages(); 
+        }
+        
+        function updateMainPreview() { 
+            if (uploadedFiles.length === 0 || activeImageIndex === -1) { 
+                mainPreviewArea.innerHTML = ''; 
+                mainPreviewArea.appendChild(mainPreviewPlaceholder); 
+                return; 
+            } 
+            const activeFile = uploadedFiles[activeImageIndex]; 
+            mainPreviewArea.innerHTML = `<img src="${activeFile.objectURL}" alt="Main preview">`; 
+        }
+
+        function addFiles(newFiles) { 
+            Array.from(newFiles).forEach(file => { 
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select image files only.');
+                    return;
+                }
+                uploadedFiles.push({ type: 'file', file: file, objectURL: URL.createObjectURL(file) }); 
+            }); 
+            activeImageIndex = uploadedFiles.length > 0 ? uploadedFiles.length - 1 : -1; 
+            renderImages(); 
+        }
+        
+        function deleteImage(index) { 
+            if (index === -1) return; 
+            const fileEntry = uploadedFiles[index]; 
+            if (fileEntry && fileEntry.type === 'file' && fileEntry.objectURL) { 
+                URL.revokeObjectURL(fileEntry.objectURL); 
+            } 
+            uploadedFiles.splice(index, 1); 
+            if (activeImageIndex === index) { 
+                activeImageIndex = uploadedFiles.length > 0 ? Math.max(0, index - 1) : -1; 
+            } else if (activeImageIndex > index) { 
+                activeImageIndex--; 
+            } else if (uploadedFiles.length === 0) { 
+                activeImageIndex = -1; 
+            } 
+            renderImages(); 
+        }
+        
+        mainPreviewArea.addEventListener('click', () => fileInput.click());
+        selectFileBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
+        fileInput.addEventListener('change', (e) => addFiles(e.target.files));
+        
+        categoryBtns.forEach(btn => { 
+            btn.addEventListener('click', () => { 
+                categoryBtns.forEach(b => b.classList.remove('active', 'lost', 'found')); 
+                btn.classList.add('active', btn.dataset.category.toLowerCase()); 
+            }); 
+        });
+
+        editPostForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+
+            try {
+                // Upload new images first
+                const newImageUrls = [];
+                const fileUploads = uploadedFiles
+                    .filter(file => file.type === 'file')
+                    .map(async (fileEntry) => {
+                        const formData = new FormData();
+                        formData.append('file', fileEntry.file);
+                        
+                        const uploadResponse = await fetch('http://localhost:8000/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const uploadResult = await uploadResponse.json();
+                        if (uploadResponse.ok) {
+                            return uploadResult.url;
+                        } else {
+                            throw new Error('Failed to upload image');
                         }
                     });
-                    
-                    uploadedFiles = originalPostData.images.map(url => ({ type: 'url', src: url, objectURL: url }));
-                    activeImageIndex = uploadedFiles.length > 0 ? 0 : -1;
-                    
-                    renderImages();
-                }
-            }
 
-            function renderImages() {
-                thumbnailGallery.innerHTML = '';
-                if (uploadedFiles.length === 0) { 
-                    mainPreviewArea.innerHTML = ''; 
-                    mainPreviewArea.appendChild(mainPreviewPlaceholder); 
-                    thumbnailContainer.style.display = 'none'; 
-                    activeImageIndex = -1; 
-                } else { 
-                    if (mainPreviewPlaceholder.parentNode === mainPreviewArea) { mainPreviewPlaceholder.remove(); } 
-                    thumbnailContainer.style.display = 'block'; 
-                    if (activeImageIndex === -1 || activeImageIndex >= uploadedFiles.length) { activeImageIndex = 0; } 
-                    uploadedFiles.forEach((fileEntry, index) => { 
-                        const thumbUrl = fileEntry.objectURL; 
-                        const thumbWrapper = document.createElement('div'); 
-                        thumbWrapper.className = 'thumbnail-item'; 
-                        if (index === activeImageIndex) { thumbWrapper.classList.add('active'); } 
-                        thumbWrapper.innerHTML = `<img src="${thumbUrl}" alt="Thumbnail ${index + 1}"><button type="button" class="delete-image-btn" data-index="${index}">&times;</button>`; 
-                        thumbWrapper.addEventListener('click', () => setActiveImage(index)); 
-                        thumbnailGallery.appendChild(thumbWrapper); 
-                    }); 
-                    const addMoreBtn = document.createElement('div'); 
-                    addMoreBtn.className = 'add-more-btn'; 
-                    addMoreBtn.innerHTML = `<i class="bi bi-plus"></i>`; 
-                    addMoreBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); }); 
-                    thumbnailGallery.appendChild(addMoreBtn); 
-                    document.querySelectorAll('.delete-image-btn').forEach(btn => { 
-                        btn.addEventListener('click', (e) => { e.stopPropagation(); deleteImage(parseInt(e.currentTarget.dataset.index)); }); 
-                    }); 
-                    updateMainPreview(); 
-                }
-            }
-            
-            function setActiveImage(index) { 
-                activeImageIndex = index; 
-                renderImages(); 
-            }
-            
-            function updateMainPreview() { 
-                if (uploadedFiles.length === 0 || activeImageIndex === -1) { 
-                    mainPreviewArea.innerHTML = ''; 
-                    mainPreviewArea.appendChild(mainPreviewPlaceholder); 
-                    return; 
-                } 
-                const activeFile = uploadedFiles[activeImageIndex]; 
-                const previewUrl = activeFile.objectURL; 
-                mainPreviewArea.innerHTML = `<img src="${previewUrl}" alt="Main preview">`; 
-            }
+                // Wait for all uploads to complete
+                const uploadedUrls = await Promise.all(fileUploads);
+                newImageUrls.push(...uploadedUrls);
 
-            function addFiles(newFiles) { 
-                Array.from(newFiles).forEach(file => { uploadedFiles.push({ type: 'file', file: file, objectURL: URL.createObjectURL(file) }); }); 
-                activeImageIndex = uploadedFiles.length > 0 ? uploadedFiles.length - 1 : -1; 
-                renderImages(); 
-            }
-            
-            function deleteImage(index) { 
-                if (index === -1) return; 
-                const fileEntry = uploadedFiles[index]; 
-                if (fileEntry && fileEntry.type === 'file' && fileEntry.objectURL) { URL.revokeObjectURL(fileEntry.objectURL); } 
-                uploadedFiles.splice(index, 1); 
-                if (activeImageIndex === index) { 
-                    activeImageIndex = uploadedFiles.length > 0 ? Math.max(0, index - 1) : -1; 
-                } else if (activeImageIndex > index) { 
-                    activeImageIndex--; 
-                } else if (uploadedFiles.length === 0) { 
-                    activeImageIndex = -1; 
-                } 
-                renderImages(); 
-            }
-            
-            mainPreviewArea.addEventListener('click', () => fileInput.click());
-            selectFileBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
-            fileInput.addEventListener('change', (e) => addFiles(e.target.files));
-            categoryBtns.forEach(btn => { 
-                btn.addEventListener('click', () => { 
-                    categoryBtns.forEach(b => b.classList.remove('active', 'lost', 'found')); 
-                    btn.classList.add('active', btn.dataset.category.toLowerCase()); 
-                }); 
-            });
+                // Combine existing URLs with new ones
+                const existingUrls = uploadedFiles
+                    .filter(file => file.type === 'url')
+                    .map(file => file.src);
+                
+                const allImageUrls = [...existingUrls, ...newImageUrls];
 
-            editPostForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (editPostForm.checkValidity()) {
-                    const updatedData = { 
-                        id: new URLSearchParams(window.location.search).get('id'), 
-                        name: itemNameInput.value, 
-                        category: document.querySelector('.category-btn.active').dataset.category, 
-                        place: itemPlaceInput.value, 
-                        description: itemDetailsTextarea.value, 
-                        images: uploadedFiles.map(f => f.objectURL || f.src) 
-                    };
-                    console.log('Post updated:', updatedData);
-                    alert('Post saved successfully!');
-                    window.location.href = 'index.html'; 
-                } else {
-                    editPostForm.reportValidity();
-                }
-            });
+                // Update post data
+                const updateData = {
+                    item_name: itemNameInput.value.trim(),
+                    item_status: document.querySelector('.category-btn.active').dataset.category,
+                    place: itemPlaceInput.value.trim(),
+                    description: itemDetailsTextarea.value.trim(),
+                    images: allImageUrls
+                };
 
-            discardBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to discard all changes and return to your profile?')) {
+                // Send update request
+                const response = await LostFoundAPI.updatePostStatus(postId, updateData);
+                
+                if (response.success) {
+                    alert('Post updated successfully!');
                     window.location.href = 'profile.html';
+                } else {
+                    throw new Error('Failed to update post');
                 }
-            });
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const postId = urlParams.get('id');
-            if (postId) {
-                loadPostData(postId);
-            } 
+            } catch (error) {
+                console.error('Error updating post:', error);
+                alert('Failed to update post. Please try again.');
+            }
         });
-        </script>
+
+        discardBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to discard all changes?')) {
+                if (originalPostData) {
+                    populateForm(originalPostData);
+                }
+            }
+        });
+
+        function validateForm() {
+            const itemName = itemNameInput.value.trim();
+            const itemPlace = itemPlaceInput.value.trim();
+            const itemDetails = itemDetailsTextarea.value.trim();
+            const activeCategory = document.querySelector('.category-btn.active');
+
+            if (!itemName) {
+                alert('Please enter item name.');
+                itemNameInput.focus();
+                return false;
+            }
+
+            if (!itemPlace) {
+                alert('Please enter the place.');
+                itemPlaceInput.focus();
+                return false;
+            }
+
+            if (!itemDetails) {
+                alert('Please enter item details.');
+                itemDetailsTextarea.focus();
+                return false;
+            }
+
+            if (!activeCategory) {
+                alert('Please select a category (Lost or Found).');
+                return false;
+            }
+
+            return true;
+        }
+
+        function showError(message) {
+            const formCard = document.querySelector('.form-card');
+            formCard.innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-danger">Error</h2>
+                    <p class="mt-3">${message}</p>
+                    <div class="mt-4">
+                        <a href="profile.html" class="btn btn-primary">Back to Profile</a>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    </script>
     </body>
 </html>

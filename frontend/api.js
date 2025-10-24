@@ -12,8 +12,12 @@ class LostFoundAPI {
             ...options
         };
         
+        console.log(`API Request: ${config.method} ${url}`, config.body ? JSON.parse(config.body) : 'No body');
+        
         try {
             const response = await fetch(url, config);
+            
+            console.log(`API Response: ${response.status} ${response.statusText}`);
             
             // Handle cases where response might not be JSON
             const contentType = response.headers.get('content-type');
@@ -25,7 +29,7 @@ class LostFoundAPI {
             }
             
             if (!response.ok) {
-                throw new Error(data.detail || data || 'API request failed');
+                throw new Error(data.detail || data.message || data || `HTTP ${response.status}: ${response.statusText}`);
             }
             
             return data;
@@ -75,15 +79,56 @@ class LostFoundAPI {
     static async getUserProfile(studentId) {
         return this.request(`/users/${studentId}`);
     }
-    
-    // Add to your existing LostFoundAPI class in api.js
+
+    // Try different methods for updating user profile
+    static async updateUserProfile(studentId, profileData) {
+        // First try PUT
+        try {
+            return await this.request(`/users/${studentId}`, {
+                method: 'PUT',
+                body: JSON.stringify(profileData)
+            });
+        } catch (error) {
+            console.log('PUT failed, trying PATCH...');
+            // If PUT fails, try PATCH
+            try {
+                return await this.request(`/users/${studentId}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify(profileData)
+                });
+            } catch (patchError) {
+                console.log('PATCH failed, trying POST...');
+                // If PATCH fails, try POST to update endpoint
+                try {
+                    return await this.request(`/users/${studentId}/update`, {
+                        method: 'POST',
+                        body: JSON.stringify(profileData)
+                    });
+                } catch (postError) {
+                    console.log('All update methods failed');
+                    throw new Error(`All update methods failed. Last error: ${postError.message}`);
+                }
+            }
+        }
+    }
+
+    // Alternative: Try profile-specific endpoint
+    static async updateUserProfileAlternative(studentId, profileData) {
+        return this.request('/profile/update', {
+            method: 'POST',
+            body: JSON.stringify({
+                student_id: studentId,
+                ...profileData
+            })
+        });
+    }
 
     // Update post status
     static async updatePostStatus(postId, statusData) {
-    return this.request(`/posts/${postId}`, {
-        method: 'PUT',
-        body: JSON.stringify(statusData)
-    });
+        return this.request(`/posts/${postId}`, {
+            method: 'PUT',
+            body: JSON.stringify(statusData)
+        });
     }
 
     // Delete post
@@ -92,4 +137,39 @@ class LostFoundAPI {
             method: 'DELETE'
         });
     }
+
+    // Temporary debug function - call this in console to test endpoints
+    static async testEndpoints(studentId) {
+        const testData = { full_name: "Test Name" };
+        
+        console.log('Testing endpoints...');
+        
+        const endpoints = [
+            { method: 'PUT', url: `/users/${studentId}` },
+            { method: 'PATCH', url: `/users/${studentId}` },
+            { method: 'POST', url: `/users/${studentId}/update` },
+            { method: 'PUT', url: '/profile' },
+            { method: 'PATCH', url: '/profile' },
+            { method: 'POST', url: '/profile/update' },
+        ];
+        
+        for (let endpoint of endpoints) {
+            try {
+                console.log(`Trying ${endpoint.method} ${endpoint.url}`);
+                const result = await this.request(endpoint.url, {
+                    method: endpoint.method,
+                    body: JSON.stringify(testData)
+                });
+                console.log(`✅ SUCCESS: ${endpoint.method} ${endpoint.url}`);
+                console.log('Response:', result);
+                return endpoint; // Return the working endpoint
+            } catch (error) {
+                console.log(`❌ FAILED: ${endpoint.method} ${endpoint.url} - ${error.message}`);
+            }
+        }
+        
+        console.log('No endpoints worked');
+        return null;
+    }
+    
 }

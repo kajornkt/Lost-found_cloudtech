@@ -1,4 +1,3 @@
-// post created //
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +13,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <style>
-        /* --- Root Variables --- */
         :root {
             --font-family: 'Gabarito', sans-serif;
             --bg-main: #f8f9fa;
@@ -24,7 +22,7 @@
             --color-post-btn-bg: #66d9b3;
             --color-post-btn-text: #ffffff;
             --color-action-btn-bg: #5dade2;
-            --color-btn-text: #ffffff; /* Renamed for consistency */
+            --color-btn-text: #ffffff;
             --color-lost-bg: #F7D47A;
             --color-lost-text: #B68439;
             --color-found-bg: #21D0B3;
@@ -44,7 +42,6 @@
             overflow-x: hidden;
         }
         
-        /* --- Sidebar & Layout (From Profile Page) --- */
         .sidebar {
             width: 280px;
             background-color: var(--bg-sidebar);
@@ -98,7 +95,6 @@
             transition: all 0.3s ease;
         }
         
-        /* --- Mobile Header (From Profile Page) --- */
         .mobile-header {
             display: none;
             position: fixed;
@@ -137,7 +133,6 @@
         .mobile-menu-body a i { margin-right: 15px; font-size: 22px; color: var(--text-muted); }
         .logout-btn-mobile { width: 100%; margin-top: 15px; }
 
-        /* --- Main Content Container --- */
         .content {
             margin-left: 280px;
             flex: 1;
@@ -145,12 +140,12 @@
             transition: margin-left 0.3s ease, width 0.3s ease;
         }
 
-        /* --- Styles for Create Post Form (Unchanged) --- */
         .form-card { background: var(--bg-card); padding: 50px; width: 100%; max-width: 1100px; margin: 0 auto; border-radius: 24px; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06); }
         .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; }
         .form-card h2 { font-size: 36px; font-weight: 700; color: var(--text-dark); }
         .post-btn { background-color: var(--color-post-btn-bg); color: var(--color-post-btn-text); padding: 14px 50px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 16px; transition: opacity 0.3s ease; }
         .post-btn:hover { opacity: 0.9; }
+        .post-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
         .form-content { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: stretch; }
         .right-section { display: flex; flex-direction: column; gap: 12px; }
         .image-uploader { display: flex; flex-direction: column; flex-grow: 1; min-height: 0; }
@@ -178,12 +173,28 @@
         .thumbnail-gallery::-webkit-scrollbar-thumb { background-color: #ced4da; border-radius: 10px; }
         .thumbnail-item, .add-more-btn { min-width: 80px; height: 80px; border-radius: 12px; cursor: pointer; position: relative; flex-shrink: 0; }
         .thumbnail-item { border: 2px solid #ced4da; overflow: hidden; background-color: var(--bg-card); }
-        .thumbnail-item img { width: 100%; height: 100%; object-fit: contain; }
+        .thumbnail-item img { width: 100%; height: 100%; object-fit: cover; }
         .thumbnail-item.active { border-color: var(--color-action-btn-bg); }
         .delete-image-btn { position: absolute; top: 4px; right: 4px; background-color: rgba(0, 0, 0, 0.6); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; line-height: 20px; text-align: center; opacity: 0; transition: opacity 0.2s; }
         .thumbnail-item:hover .delete-image-btn { opacity: 1; }
         .add-more-btn { display: flex; align-items: center; justify-content: center; background-color: transparent; color: var(--border-color); font-size: 24px; border: 2px dashed var(--border-color); transition: all 0.2s ease; }
         .add-more-btn:hover { background-color: var(--bg-input); border-color: #ced4da; color: var(--text-muted); }
+        
+        /* Loading spinner */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
         
         /* Responsive Media Queries */
         @media (max-width: 1100px) and (min-width: 992px) {
@@ -245,15 +256,33 @@
         <div class="form-card">
             <div class="form-header">
                 <h2>Create Post</h2>
-                <button type="submit" class="post-btn" form="createPostForm">Post</button>
+                <button type="submit" class="post-btn" form="createPostForm" id="submitBtn">
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                    <span id="submitText">Post</span>
+                </button>
             </div>
             <form id="createPostForm">
                 <div class="form-content">
                     <div class="left-section">
-                        <div class="form-group"><label>Category</label><div class="category-buttons"><button type="button" class="category-btn active lost" data-category="lost">Lost</button><button type="button" class="category-btn found" data-category="found">Found</button></div></div>
-                        <div class="form-group"><label for="itemName">Item's name</label><input type="text" id="itemName" class="form-control-custom" required /></div>
-                        <div class="form-group"><label for="itemPlace">Place</label><input type="text" id="itemPlace" class="form-control-custom" required /></div>
-                        <div class="form-group"><label for="itemDetails">Details</label><textarea id="itemDetails" class="form-control-custom" required></textarea></div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <div class="category-buttons">
+                                <button type="button" class="category-btn active lost" data-category="lost">Lost</button>
+                                <button type="button" class="category-btn found" data-category="found">Found</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemName">Item's name</label>
+                            <input type="text" id="itemName" class="form-control-custom" placeholder="Enter item name" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="itemPlace">Place</label>
+                            <input type="text" id="itemPlace" class="form-control-custom" placeholder="Where was it lost/found?" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="itemDetails">Details</label>
+                            <textarea id="itemDetails" class="form-control-custom" placeholder="Describe the item in detail..." required></textarea>
+                        </div>
                     </div>
                     
                     <div class="right-section">
@@ -263,7 +292,7 @@
                                 <div class="main-preview-placeholder" id="mainPreviewPlaceholder">
                                     <i class="bi bi-cloud-arrow-up-fill"></i>
                                     <p>Choose file type to upload</p>
-                                    <span>JPEG, PNG, PDF up to 50MB</span>
+                                    <span>JPEG, PNG up to 50MB</span>
                                     <button type="button" class="select-file-btn">Select file</button>
                                 </div>
                             </div>
@@ -280,103 +309,337 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // SCRIPT FOR FORM (UNCHANGED)
+    document.addEventListener('DOMContentLoaded', function() {
         const fileInput = document.getElementById('fileInput');
         const mainPreviewArea = document.getElementById('mainPreviewArea');
         const mainPreviewPlaceholder = document.getElementById('mainPreviewPlaceholder');
         const thumbnailContainer = document.getElementById('thumbnailContainer');
         const thumbnailGallery = document.getElementById('thumbnailGallery');
         const form = document.getElementById('createPostForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
         const selectFileBtn = document.querySelector('.select-file-btn');
-        let uploadedFiles = [], activeImageIndex = 0;
-        
-        function renderImages() {
-            thumbnailGallery.innerHTML = '';
-            if (uploadedFiles.length === 0) { 
-                mainPreviewArea.innerHTML = ''; 
-                mainPreviewArea.appendChild(mainPreviewPlaceholder); 
-                thumbnailContainer.style.display = 'none'; 
-                activeImageIndex = 0; 
-            } else { 
-                if (document.body.contains(mainPreviewPlaceholder)) {
-                    mainPreviewPlaceholder.remove();
-                }
-                thumbnailContainer.style.display = 'block'; 
-            }
-            uploadedFiles.forEach((file, index) => {
-                const thumbnailUrl = URL.createObjectURL(file);
-                const thumbWrapper = document.createElement('div');
-                thumbWrapper.className = 'thumbnail-item';
-                if (index === activeImageIndex) { thumbWrapper.classList.add('active'); }
-                thumbWrapper.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail ${index + 1}"><button type="button" class="delete-image-btn" data-index="${index}">&times;</button>`;
-                thumbWrapper.addEventListener('click', () => setActiveImage(index));
-                thumbnailGallery.appendChild(thumbWrapper);
-            });
-            const addMoreBtn = document.createElement('div');
-            addMoreBtn.className = 'add-more-btn';
-            addMoreBtn.innerHTML = `<i class="bi bi-plus"></i>`;
-            addMoreBtn.addEventListener('click', () => fileInput.click());
-            thumbnailGallery.appendChild(addMoreBtn);
-            document.querySelectorAll('.delete-image-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => { 
-                    e.stopPropagation(); 
-                    deleteImage(parseInt(e.currentTarget.dataset.index)); 
-                });
-            });
-            if (uploadedFiles.length > 0) { updateMainPreview(); }
+        let uploadedFiles = [];
+        let activeImageIndex = 0;
+
+        // Check if user is logged in
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+            window.location.href = 'signin.html';
+            return;
         }
 
-        mainPreviewArea.addEventListener('click', () => fileInput.click());
-        selectFileBtn.addEventListener('click', (e) => {
+        const currentUser = JSON.parse(userData);
+        console.log('Current user data:', currentUser);
+
+        // Add logout functionality
+        document.querySelectorAll('.logout-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                localStorage.removeItem('user');
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = 'signin.html';
+            });
+        });
+
+        // Category button functionality
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function renderImages() {
+            thumbnailGallery.innerHTML = '';
+            
+            if (uploadedFiles.length === 0) { 
+                // Reset main preview area
+                mainPreviewArea.innerHTML = '';
+                mainPreviewArea.appendChild(mainPreviewPlaceholder);
+                thumbnailContainer.style.display = 'none';
+                activeImageIndex = 0;
+            } else {
+                // Remove placeholder if it exists
+                const placeholder = mainPreviewArea.querySelector('.main-preview-placeholder');
+                if (placeholder) {
+                    placeholder.remove();
+                }
+                thumbnailContainer.style.display = 'block';
+            }
+            
+            // Create thumbnails
+            uploadedFiles.forEach(function(file, index) {
+                const thumbnailUrl = URL.createObjectURL(file);
+                const thumbWrapper = document.createElement('div');
+                thumbWrapper.className = 'thumbnail-item ' + (index === activeImageIndex ? 'active' : '');
+                thumbWrapper.innerHTML = '<img src="' + thumbnailUrl + '" alt="Thumbnail ' + (index + 1) + '"><button type="button" class="delete-image-btn" data-index="' + index + '">&times;</button>';
+                thumbWrapper.addEventListener('click', function() {
+                    setActiveImage(index);
+                });
+                thumbnailGallery.appendChild(thumbWrapper);
+            });
+            
+            // Add "add more" button
+            const addMoreBtn = document.createElement('div');
+            addMoreBtn.className = 'add-more-btn';
+            addMoreBtn.innerHTML = '<i class="bi bi-plus"></i>';
+            addMoreBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+            thumbnailGallery.appendChild(addMoreBtn);
+            
+            // Add delete button event listeners
+            document.querySelectorAll('.delete-image-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const index = parseInt(this.getAttribute('data-index'));
+                    deleteImage(index);
+                });
+            });
+            
+            // Update main preview
+            if (uploadedFiles.length > 0) {
+                updateMainPreview();
+            }
+        }
+
+        function setActiveImage(index) {
+            activeImageIndex = index;
+            renderImages();
+        }
+
+        function updateMainPreview() {
+            if (uploadedFiles.length === 0) return;
+            
+            const activeFile = uploadedFiles[activeImageIndex];
+            const previewUrl = URL.createObjectURL(activeFile);
+            
+            mainPreviewArea.innerHTML = '<img src="' + previewUrl + '" alt="Main preview" style="width: 100%; height: 100%; object-fit: contain;">';
+        }
+
+        function addFiles(newFiles) {
+            const validFiles = Array.from(newFiles).filter(function(file) {
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select image files only (JPEG, PNG, etc.).');
+                    return false;
+                }
+                if (file.size > 50 * 1024 * 1024) {
+                    alert('File size must be less than 50MB.');
+                    return false;
+                }
+                return true;
+            });
+
+            if (validFiles.length > 0) {
+                uploadedFiles = uploadedFiles.concat(validFiles);
+                activeImageIndex = uploadedFiles.length - 1;
+                renderImages();
+            }
+        }
+
+        function deleteImage(index) {
+            // Revoke object URL to prevent memory leaks
+            if (uploadedFiles[index]) {
+                URL.revokeObjectURL(uploadedFiles[index]);
+            }
+            
+            uploadedFiles.splice(index, 1);
+            
+            if (activeImageIndex >= uploadedFiles.length) {
+                activeImageIndex = Math.max(0, uploadedFiles.length - 1);
+            }
+            
+            renderImages();
+        }
+
+        function showLoading() {
+            submitBtn.disabled = true;
+            loadingSpinner.style.display = 'inline-block';
+            submitText.textContent = 'Posting...';
+        }
+
+        function hideLoading() {
+            submitBtn.disabled = false;
+            loadingSpinner.style.display = 'none';
+            submitText.textContent = 'Post';
+        }
+
+        // Event listeners
+        mainPreviewArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        selectFileBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             fileInput.click();
         });
-        fileInput.addEventListener('change', (e) => addFiles(e.target.files));
         
-        function setActiveImage(index) { 
-            activeImageIndex = index; 
-            renderImages(); 
-        }
-        
-        function updateMainPreview() { 
-            if (uploadedFiles.length === 0) return; 
-            const activeFile = uploadedFiles[activeImageIndex]; 
-            const previewUrl = URL.createObjectURL(activeFile); 
-            mainPreviewArea.innerHTML = `<img src="${previewUrl}" alt="Main preview">`; 
-        }
-        
-        function addFiles(newFiles) { 
-            Array.from(newFiles).forEach(file => uploadedFiles.push(file)); 
-            activeImageIndex = uploadedFiles.length - 1; 
-            renderImages(); 
-        }
-        
-        function deleteImage(index) { 
-            uploadedFiles.splice(index, 1); 
-            if (activeImageIndex >= uploadedFiles.length) { 
-                activeImageIndex = uploadedFiles.length - 1; 
-            } 
-            if (activeImageIndex < 0) activeImageIndex = 0; 
-            renderImages(); 
-        }
-        
-        document.addEventListener('DOMContentLoaded', renderImages);
-        
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.addEventListener('click', () => { 
-                document.querySelector('.category-btn.active').classList.remove('active'); 
-                btn.classList.add('active'); 
-            });
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                addFiles(e.target.files);
+            }
+            e.target.value = '';
         });
-        
-        form.addEventListener('submit', (e) => {
+
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            if (form.checkValidity()) { 
-                alert(`Post created successfully with ${uploadedFiles.length} image(s)!`); 
-            } else { 
-                form.reportValidity(); 
+            
+            if (!validateForm()) {
+                return;
+            }
+
+            showLoading();
+
+            try {
+                // Upload images first if any
+                const imageUrls = [];
+                if (uploadedFiles.length > 0) {
+                    for (let i = 0; i < uploadedFiles.length; i++) {
+                        const file = uploadedFiles[i];
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        console.log('Uploading image:', file.name);
+                        
+                        const uploadResponse = await fetch('http://localhost:8000/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        console.log('Upload response status:', uploadResponse.status);
+                        
+                        if (!uploadResponse.ok) {
+                            throw new Error('Upload failed with status ' + uploadResponse.status);
+                        }
+                        
+                        const uploadResult = await uploadResponse.json();
+                        console.log('Upload success:', uploadResult);
+                        
+                        if (uploadResult.url) {
+                            imageUrls.push(uploadResult.url);
+                        } else {
+                            throw new Error('No URL returned from upload');
+                        }
+                    }
+                }
+
+                // Get form data
+                const activeCategory = document.querySelector('.category-btn.active');
+                if (!activeCategory) {
+                    throw new Error('No category selected');
+                }
+
+                // Get user ID
+                const userData = JSON.parse(localStorage.getItem('user'));
+                const studentId = userData.student_id || userData.id || userData.user_id;
+                
+                if (!studentId) {
+                    throw new Error('User ID not found. Please log in again.');
+                }
+
+                const postData = {
+                    student_id: parseInt(studentId),
+                    item_name: document.getElementById('itemName').value.trim(),
+                    description: document.getElementById('itemDetails').value.trim(),
+                    item_status: activeCategory.getAttribute('data-category'),
+                    place: document.getElementById('itemPlace').value.trim(),
+                    images: imageUrls
+                };
+
+                console.log('Sending post data:', postData);
+
+                // Create the post
+                const response = await fetch('http://localhost:8000/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(postData)
+                });
+
+                console.log('Response status:', response.status);
+
+                const result = await response.json();
+                console.log('Full API response:', result);
+                
+                if (response.ok) {
+                    alert('Post created successfully!');
+                    window.location.href = 'index.html';
+                } else {
+                    // Show detailed validation errors
+                    let errorMessage = 'Failed to create post: ';
+                    
+                    if (result.detail && Array.isArray(result.detail)) {
+                        console.log('Detailed validation errors:', result.detail);
+                        
+                        const errorDetails = result.detail.map(function(err) {
+                            console.log('Error object:', err);
+                            if (err.msg) {
+                                return err.msg + (err.loc ? ' (' + err.loc.join('.') + ')' : '');
+                            } else if (typeof err === 'string') {
+                                return err;
+                            } else if (err.message) {
+                                return err.message;
+                            } else {
+                                return JSON.stringify(err);
+                            }
+                        }).join(', ');
+                        
+                        errorMessage += errorDetails;
+                    } else if (result.detail) {
+                        errorMessage += result.detail;
+                    } else if (result.message) {
+                        errorMessage += result.message;
+                    } else {
+                        errorMessage += 'Unknown error occurred';
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+            } catch (error) {
+                console.error('Error creating post:', error);
+                alert('Failed to create post: ' + error.message);
+            } finally {
+                hideLoading();
             }
         });
+
+        function validateForm() {
+            const itemName = document.getElementById('itemName').value.trim();
+            const itemPlace = document.getElementById('itemPlace').value.trim();
+            const itemDetails = document.getElementById('itemDetails').value.trim();
+            const activeCategory = document.querySelector('.category-btn.active');
+
+            if (!itemName) {
+                alert('Please enter item name.');
+                document.getElementById('itemName').focus();
+                return false;
+            }
+
+            if (!itemPlace) {
+                alert('Please enter the place.');
+                document.getElementById('itemPlace').focus();
+                return false;
+            }
+
+            if (!itemDetails) {
+                alert('Please enter item details.');
+                document.getElementById('itemDetails').focus();
+                return false;
+            }
+
+            if (!activeCategory) {
+                alert('Please select a category (Lost or Found).');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Initialize
+        renderImages();
+    });
     </script>
 </body>
 </html>

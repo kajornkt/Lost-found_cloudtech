@@ -202,6 +202,14 @@
                     // Load user profile from backend
                     const userProfile = await LostFoundAPI.getUserProfile(studentId);
                     console.log('User profile:', userProfile);
+                    
+                    // Update localStorage with latest data
+                    const updatedUser = {
+                        ...currentUser,
+                        ...userProfile
+                    };
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    
                     displayUserProfile(userProfile);
                     
                     // Load user posts
@@ -213,13 +221,7 @@
                     console.error('Failed to load profile:', error);
                     // Show user data from localStorage as fallback
                     displayUserProfile(currentUser);
-                    document.querySelector('.item-list').innerHTML = `
-                        <div class="text-center py-4">
-                            <i class="bi bi-inbox" style="font-size: 2rem; color: #6c757d;"></i>
-                            <p class="mt-2 text-muted">You haven't created any posts yet.</p>
-                            <a href="post_created.html" class="btn profile-setting-btn">Create Your First Post</a>
-                        </div>
-                    `;
+                    showNoPostsMessage();
                 }
             }
 
@@ -232,22 +234,23 @@
                     profileImage.src = 'pic/profile.png'; // Default image
                 }
                 
-                document.querySelector('h3.fw-bold').textContent = profile.full_name || profile.name || '[Name Surname]';
-                document.querySelector('.text-muted.mb-0').textContent = 
-                    `${profile.faculty || '[Faculty]'}, Year ${profile.class_year || '[Class year]'}`;
+                // Update name - check both full_name and name fields
+                const name = profile.full_name || profile.name || '[Name Surname]';
+                document.querySelector('h3.fw-bold').textContent = name;
+                
+                // Update faculty and class year
+                const faculty = profile.faculty || '[Faculty]';
+                const classYear = profile.class_year || '[Class year]';
+                document.querySelector('.text-muted.mb-0').textContent = `${faculty}, Year ${classYear}`;
+                
+                console.log('Displaying profile:', { name, faculty, classYear });
             }
 
             function displayUserPosts(posts) {
                 const itemList = document.querySelector('.item-list');
                 
                 if (!posts || posts.length === 0) {
-                    itemList.innerHTML = `
-                        <div class="text-center py-4">
-                            <i class="bi bi-inbox" style="font-size: 2rem; color: #6c757d;"></i>
-                            <p class="mt-2 text-muted">You haven't created any posts yet.</p>
-                            <a href="post_created.html" class="btn profile-setting-btn">Create Your First Post</a>
-                        </div>
-                    `;
+                    showNoPostsMessage();
                     return;
                 }
 
@@ -283,6 +286,17 @@
 
                 // Add event listeners for status changes and deletion
                 attachPostEventListeners();
+            }
+
+            function showNoPostsMessage() {
+                const itemList = document.querySelector('.item-list');
+                itemList.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-inbox" style="font-size: 2rem; color: #6c757d;"></i>
+                        <p class="mt-2 text-muted">You haven't created any posts yet.</p>
+                        <a href="post_created.html" class="btn profile-setting-btn">Create Your First Post</a>
+                    </div>
+                `;
             }
 
             function getStatusOptions(currentStatus) {
@@ -334,7 +348,7 @@
                                 // Check if no posts left
                                 const remainingPosts = document.querySelectorAll('[data-post-id]');
                                 if (remainingPosts.length === 0) {
-                                    displayUserPosts([]);
+                                    showNoPostsMessage();
                                 }
                             } catch (error) {
                                 console.error('Failed to delete post:', error);
@@ -344,6 +358,20 @@
                     });
                 });
             }
+
+            // Force reload profile data when page is shown (especially after returning from profile setting)
+            function handlePageVisibility() {
+                if (!document.hidden) {
+                    console.log('Page became visible, reloading profile data...');
+                    loadProfile();
+                }
+            }
+
+            // Listen for page visibility changes
+            document.addEventListener('visibilitychange', handlePageVisibility);
+            
+            // Also reload when page is focused (useful for returning from other tabs/pages)
+            window.addEventListener('focus', handlePageVisibility);
 
             // Load profile when page loads
             loadProfile();

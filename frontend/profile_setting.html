@@ -494,6 +494,9 @@
         currentUser = JSON.parse(userData);
         const studentId = currentUser.student_id;
 
+        console.log('Current user:', currentUser);
+        console.log('Student ID:', studentId);
+
         // Add logout functionality
         document.querySelectorAll('.logout-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -513,19 +516,23 @@
         // Load user data
         async function loadUserProfile() {
             try {
+                console.log('Loading user profile for:', studentId);
                 const userProfile = await LostFoundAPI.getUserProfile(studentId);
-                originalUserData = JSON.parse(JSON.stringify(userProfile)); // Deep copy for reset
+                console.log('Loaded user profile:', userProfile);
+                originalUserData = JSON.parse(JSON.stringify(userProfile));
                 populateForm(userProfile);
             } catch (error) {
-                console.error('Failed to load user profile:', error);
-                // Use localStorage data as fallback
+                console.error('Failed to load user profile from API:', error);
+                console.log('Using localStorage data as fallback:', currentUser);
                 populateForm(currentUser);
             }
         }
 
         function populateForm(userData) {
+            console.log('Populating form with:', userData);
+            
             // Populate form fields
-            document.getElementById('name').value = userData.full_name || '';
+            document.getElementById('name').value = userData.full_name || userData.name || '';
             document.getElementById('faculty').value = userData.faculty || 'Select';
             document.getElementById('class-year').value = userData.class_year || '';
             document.getElementById('email').value = userData.email || '';
@@ -537,11 +544,16 @@
                 imagePreview.style.display = 'block';
                 imageIcon.style.display = 'none';
                 fileNameDisplay.textContent = 'Current profile picture';
+            } else {
+                fileNameDisplay.textContent = 'Profile picture';
+                imagePreview.style.display = 'none';
+                imageIcon.style.display = 'flex';
             }
 
             // Populate social links
             resetSocialLinks();
             if (userData.social_profiles && userData.social_profiles.length > 0) {
+                console.log('Loading social profiles:', userData.social_profiles);
                 userData.social_profiles.forEach(social => {
                     createSocialLinkGroupWithData(social.platform, social.profile_url);
                 });
@@ -557,16 +569,36 @@
                 return;
             }
 
+            let saveButton = null;
+            let originalText = '';
+
             try {
                 const formData = collectFormData();
-                // Here you would call your backend API to update the profile
-                // For now, we'll update localStorage and show success message
+                console.log('Submitting form data:', formData);
+                
+                // Show loading state - use more reliable button selection
+                saveButton = document.querySelector('.btn-save');
+                if (saveButton) {
+                    originalText = saveButton.textContent;
+                    saveButton.textContent = 'Saving...';
+                    saveButton.disabled = true;
+                }
+
+                // Update profile via API
                 await updateUserProfile(formData);
+                
                 alert('Profile updated successfully!');
                 window.location.href = 'profile.html';
+                
             } catch (error) {
                 console.error('Failed to update profile:', error);
-                alert('Failed to update profile. Please try again.');
+                alert('Failed to update profile: ' + (error.message || 'Please check console for details'));
+            } finally {
+                // Always restore button state, even if there's an error
+                if (saveButton) {
+                    saveButton.textContent = originalText || 'Save';
+                    saveButton.disabled = false;
+                }
             }
         });
 
@@ -604,6 +636,12 @@
                 return false;
             }
 
+            if (classYear < 1 || classYear > 8) {
+                alert('Please enter a valid class year (1-8).');
+                document.getElementById('class-year').focus();
+                return false;
+            }
+
             if (!email) {
                 alert('Please enter your email.');
                 document.getElementById('email').focus();
@@ -624,6 +662,15 @@
                 return false;
             }
 
+            // Basic phone validation (Thai format)
+            const phoneRegex = /^[0-9]{9,10}$/;
+            const cleanPhone = phone.replace(/-/g, '');
+            if (!phoneRegex.test(cleanPhone)) {
+                alert('Please enter a valid phone number (9-10 digits).');
+                document.getElementById('phone').focus();
+                return false;
+            }
+
             // Validate social links
             const socialLinks = collectSocialLinks();
             if (socialLinks.length === 0) {
@@ -631,19 +678,36 @@
                 return false;
             }
 
+            // Validate each social link
+            for (const link of socialLinks) {
+                if (!link.profile_url) {
+                    alert('Please fill in all social media links or remove empty ones.');
+                    return false;
+                }
+            }
+
             return true;
         }
 
         function collectFormData() {
-            return {
+            const formData = {
                 full_name: document.getElementById('name').value.trim(),
                 faculty: document.getElementById('faculty').value,
-                class_year: document.getElementById('class-year').value.trim(),
+                class_year: parseInt(document.getElementById('class-year').value.trim()),
                 email: document.getElementById('email').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                social_profiles: collectSocialLinks(),
-                profile_photo_url: imagePreview.src || currentUser.profile_photo_url
+                phone: document.getElementById('phone').value.trim().replace(/-/g, ''),
+                social_profiles: collectSocialLinks()
             };
+
+            // Only include profile_photo_url if it's a new image (data URL)
+            if (imagePreview.src && imagePreview.src.startsWith('data:')) {
+                formData.profile_photo_url = imagePreview.src;
+            } else if (imagePreview.src && imagePreview.src !== '') {
+                formData.profile_photo_url = imagePreview.src;
+            }
+
+            console.log('Collected form data:', formData);
+            return formData;
         }
 
         function collectSocialLinks() {
@@ -655,20 +719,189 @@
         }
 
         async function updateUserProfile(formData) {
-            // Update localStorage with new data
-            const updatedUser = {
-                ...currentUser,
-                ...formData
-            };
-            localStorage.setItem('user', JSON.stringify(updatedUser));
+            try {
+                console.log('Attempting to update profile for student:', studentId);
+                console.log('Form data to send:', formData);
 
-            // Here you would call your backend API to update the profile
-            // Example: await LostFoundAPI.updateUserProfile(studentId, formData);
-            
-            // For now, we'll just log the data
-            console.log('Profile data to update:', formData);
-            return Promise.resolve();
+                // Prepare the data for API
+                const apiData = {
+                    full_name: formData.full_name,
+                    faculty: formData.faculty,
+                    class_year: formData.class_year,
+                    email: formData.email,
+                    phone: formData.phone,
+                    social_profiles: formData.social_profiles
+                };
+
+                // Only include profile_photo_url if it's a new image
+                if (formData.profile_photo_url && formData.profile_photo_url.startsWith('data:')) {
+                    apiData.profile_photo_url = formData.profile_photo_url;
+                } else if (formData.profile_photo_url) {
+                    // If it's a URL (not data URL), include it
+                    apiData.profile_photo_url = formData.profile_photo_url;
+                }
+
+                console.log('Sending to API:', apiData);
+
+                let updatedProfile;
+                
+                // Try the main update method first
+                try {
+                    updatedProfile = await LostFoundAPI.updateUserProfile(studentId, apiData);
+                } catch (error) {
+                    console.log('Main update method failed, trying alternative...');
+                    // If main method fails, try alternative endpoint
+                    updatedProfile = await LostFoundAPI.updateUserProfileAlternative(studentId, apiData);
+                }
+                
+                console.log('API response:', updatedProfile);
+                
+                // Update localStorage with the response from API
+                const updatedUser = {
+                    ...currentUser,
+                    ...updatedProfile
+                };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                
+                console.log('Profile updated successfully:', updatedProfile);
+                return updatedProfile;
+            } catch (error) {
+                console.error('All update attempts failed:', error);
+                
+                // Provide more specific error message
+                if (error.message.includes('Method Not Allowed')) {
+                    throw new Error('Server does not allow this update method. Please check API documentation.');
+                } else if (error.message.includes('Failed to fetch')) {
+                    throw new Error('Cannot connect to server. Please check your internet connection and try again.');
+                } else {
+                    throw new Error(`Update failed: ${error.message}`);
+                }
+            }
         }
+        // Temporary debug function - add this to your profile setting page
+        async function debugUpdateProfile() {
+            const testData = {
+                full_name: "Test Name",
+                faculty: "School of Engineering", 
+                class_year: 2,
+                email: "test@kmitl.ac.th",
+                phone: "0812345678",
+                social_profiles: [{ platform: "Facebook", profile_url: "test" }]
+            };
+
+            console.log('Testing update profile endpoints...');
+            
+            const endpoints = [
+                { method: 'PUT', url: `/users/${studentId}` },
+                { method: 'PATCH', url: `/users/${studentId}` },
+                { method: 'POST', url: `/users/${studentId}` },
+                { method: 'PUT', url: '/profile' },
+                { method: 'PATCH', url: '/profile' },
+                { method: 'POST', url: '/profile' },
+                { method: 'PUT', url: `/users/profile/${studentId}` },
+                { method: 'PATCH', url: `/users/profile/${studentId}` },
+                { method: 'POST', url: `/users/profile/${studentId}` },
+            ];
+
+            for (let endpoint of endpoints) {
+                try {
+                    console.log(`Testing ${endpoint.method} ${endpoint.url}`);
+                    const result = await LostFoundAPI.request(endpoint.url, {
+                        method: endpoint.method,
+                        body: JSON.stringify(testData)
+                    });
+                    console.log(`✅ SUCCESS: ${endpoint.method} ${endpoint.url}`, result);
+                    return endpoint;
+                } catch (error) {
+                    console.log(`❌ FAILED: ${endpoint.method} ${endpoint.url} - ${error.message}`);
+                }
+            }
+            
+            return null;
+        }
+        // Add this function to your profile setting page and run it in console
+        async function testAllEndpoints() {
+            const studentId = 1; // Your student ID
+            const testData = {
+                full_name: "Test Name Updated",
+                faculty: "School of Engineering",
+                class_year: 2,
+                email: "test@kmitl.ac.th",
+                phone: "0812345678"
+            };
+
+            console.log('🔍 Testing ALL possible user update endpoints...');
+            
+            const endpoints = [
+                // Common REST patterns
+                { method: 'PUT', url: `/users/${studentId}` },
+                { method: 'PATCH', url: `/users/${studentId}` },
+                { method: 'POST', url: `/users/${studentId}` },
+                { method: 'PUT', url: `/user/${studentId}` },
+                { method: 'PATCH', url: `/user/${studentId}` },
+                { method: 'POST', url: `/user/${studentId}` },
+                
+                // Update patterns
+                { method: 'POST', url: `/users/${studentId}/update` },
+                { method: 'POST', url: `/user/${studentId}/update` },
+                { method: 'PUT', url: `/users/update` },
+                { method: 'POST', url: `/users/update` },
+                { method: 'PUT', url: `/user/update` },
+                { method: 'POST', url: `/user/update` },
+                
+                // Profile patterns
+                { method: 'PUT', url: '/profile' },
+                { method: 'PATCH', url: '/profile' },
+                { method: 'POST', url: '/profile' },
+                { method: 'PUT', url: '/profile/update' },
+                { method: 'POST', url: '/profile/update' },
+                
+                // API versioned patterns
+                { method: 'PUT', url: '/api/users/1' },
+                { method: 'PATCH', url: '/api/users/1' },
+                { method: 'POST', url: '/api/users/1' },
+                { method: 'PUT', url: '/api/profile' },
+                { method: 'POST', url: '/api/profile' },
+            ];
+
+            let workingEndpoint = null;
+
+            for (let endpoint of endpoints) {
+                try {
+                    console.log(`🧪 Testing: ${endpoint.method} ${endpoint.url}`);
+                    const result = await LostFoundAPI.request(endpoint.url, {
+                        method: endpoint.method,
+                        body: JSON.stringify(testData)
+                    });
+                    console.log(`✅ SUCCESS: ${endpoint.method} ${endpoint.url}`, result);
+                    workingEndpoint = endpoint;
+                    break; // Stop at first success
+                } catch (error) {
+                    if (error.message.includes('405')) {
+                        console.log(`❌ METHOD NOT ALLOWED: ${endpoint.method} ${endpoint.url}`);
+                    } else if (error.message.includes('404')) {
+                        console.log(`❌ NOT FOUND: ${endpoint.method} ${endpoint.url}`);
+                    } else {
+                        console.log(`❌ FAILED: ${endpoint.method} ${endpoint.url} - ${error.message}`);
+                    }
+                }
+                // Small delay to avoid overwhelming the server
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            if (workingEndpoint) {
+                console.log(`🎉 FOUND WORKING ENDPOINT: ${workingEndpoint.method} ${workingEndpoint.url}`);
+                return workingEndpoint;
+            } else {
+                console.log('💥 No working endpoints found. Please check your backend API documentation.');
+                return null;
+            }
+        }
+
+// Run this in browser console:
+// await testAllEndpoints();
+// Call this in browser console to find the right endpoint:
+// await debugUpdateProfile();
 
         function createSocialLinkGroup(platform = '', profileUrl = '') {
             const div = document.createElement('div');
@@ -687,9 +920,9 @@
                     </div>
                     <input type="text" placeholder="Enter link or username" value="${profileUrl || ''}">
                 </div>
-                <button type="button" class="btn-remove-social" title="Remove">&times;</button>
-            `;
-            socialLinksContainer.appendChild(div);
+                    <button type="button" class="btn-remove-social" title="Remove">&times;</button>
+                `;
+                socialLinksContainer.appendChild(div);
 
             div.querySelector('.btn-remove-social').addEventListener('click', function() {
                 this.parentElement.remove();
@@ -759,6 +992,7 @@
                     const hint = document.createElement('small');
                     hint.id = 'emailHint';
                     hint.className = 'text-danger mt-1';
+                    hint.style.display = 'block';
                     hint.textContent = 'Please use @kmitl.ac.th email only';
                     this.parentNode.appendChild(hint);
                 }
@@ -767,6 +1001,17 @@
                 const hint = document.getElementById('emailHint');
                 if (hint) hint.remove();
             }
+        });
+
+        // Add phone formatting
+        document.getElementById('phone').addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 3 && value.length <= 6) {
+                value = value.replace(/(\d{3})(\d{0,3})/, '$1-$2');
+            } else if (value.length > 6) {
+                value = value.replace(/(\d{3})(\d{3})(\d{0,4})/, '$1-$2-$3');
+            }
+            this.value = value;
         });
 
         // Load user profile when page loads

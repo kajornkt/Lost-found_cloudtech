@@ -1,4 +1,3 @@
-// item details //
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +11,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
     <style>
         /* --- Root Variables --- */
@@ -168,6 +168,17 @@
         .carousel-item img { object-fit: contain; width: 100%; height: 100%; }
         .carousel-control-prev-icon, .carousel-control-next-icon { background-color: rgba(0, 0, 0, 0.4); border-radius: 50%; padding: 1.2rem; background-size: 50%; }
 
+        /* --- Phone Number Formatting --- */
+        .phone-number { font-family: monospace; font-size: 16px; letter-spacing: 1px; }
+
+        /* --- Social Media Icon Colors --- */
+        .social-icons a.facebook { background-color: #1877f2; }
+        .social-icons a.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .social-icons a.line { background-color: #00b900; }
+        .social-icons a.twitter { background-color: #1da1f2; }
+        .social-icons a.discord { background-color: #5865f2; }
+        .social-icons a.other { background-color: #6c757d; }
+
         /* --- Responsive Media Queries --- */
         @media (max-width: 1100px) and (min-width: 992px) {
             .sidebar { width: 90px; padding: 40px 0; }
@@ -235,84 +246,191 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="api.js"></script>
     <script>
-        // SCRIPT FOR DYNAMIC CONTENT (UNCHANGED)
-        document.addEventListener('DOMContentLoaded', () => {
-            const items_db = {
-                '123': { name: 'Wallet', category: 'Lost', userName: 'Jane Doe', place: 'Central Library', description: 'A black leather wallet, lost near the main entrance on Friday afternoon. Contains student ID.', images: [ 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=2070&auto=format&fit=crop', 'https://images.unsplash.com/photo-1613948338319-1970b84231db?q=80&w=1974&auto=format&fit=crop' ], phone: '081-234-5678', socials: { line: '#', facebook: '#', instagram: '#' } },
-                '201': { name: 'Keys', category: 'Found', userName: 'John Smith', place: 'Cafeteria', description: 'Set of car keys with a red keychain. Found on one of the tables.', images: [ 'https://images.unsplash.com/photo-1550995166-f00d8325cfd1?q=80&w=1974&auto=format&fit=crop' ], phone: '098-765-4321', socials: { twitter: '#', discord: '#' } }
-            };
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Check if user is logged in
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+            window.location.href = 'signin.html';
+            return;
+        }
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const itemId = urlParams.get('id');
-            const item = items_db[itemId];
-            const contentDiv = document.getElementById('details-card-content');
+        // Add logout functionality
+        document.querySelectorAll('.logout-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                localStorage.removeItem('user');
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = 'signin.html';
+            });
+        });
 
-            if (item) {
-                let carouselHTML = '';
-                item.images.forEach((img, index) => {
-                    carouselHTML += `<div class="carousel-item ${index === 0 ? 'active' : ''}"><img src="${img}" class="d-block" alt="Item Image"></div>`;
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+        const contentDiv = document.getElementById('details-card-content');
+
+        if (!postId) {
+            contentDiv.innerHTML = '<h2 class="text-center text-danger">Post ID not provided</h2>';
+            return;
+        }
+
+        try {
+            // Load post details from backend
+            const post = await LostFoundAPI.getPostDetails(postId);
+            displayPostDetails(post);
+        } catch (error) {
+            console.error('Failed to load post details:', error);
+            contentDiv.innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-danger">Failed to load post</h2>
+                    <p class="text-muted">Please check if the post exists and try again.</p>
+                    <a href="index.html" class="btn btn-primary">Back to Home</a>
+                </div>
+            `;
+        }
+
+        // Function to format phone number as 0XX XXX XXXX
+        function formatPhoneNumber(phone) {
+            if (!phone) return '';
+            // Remove all non-digit characters
+            const cleanPhone = phone.replace(/\D/g, '');
+            
+            // Format as 0XX XXX XXXX
+            if (cleanPhone.length === 10) {
+                return cleanPhone.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+            }
+            
+            return phone; // Return original if not 10 digits
+        }
+
+        // Function to get social media icon and class
+        function getSocialMediaInfo(platform, url) {
+            const platformLower = platform.toLowerCase();
+            
+            if (platformLower.includes('facebook')) {
+                return { icon: 'fab fa-facebook-f', class: 'facebook' };
+            } else if (platformLower.includes('instagram')) {
+                return { icon: 'fab fa-instagram', class: 'instagram' };
+            } else if (platformLower.includes('line')) {
+                return { icon: 'fab fa-line', class: 'line' };
+            } else if (platformLower.includes('twitter') || platformLower.includes('x')) {
+                return { icon: 'fab fa-twitter', class: 'twitter' };
+            } else if (platformLower.includes('discord')) {
+                return { icon: 'fab fa-discord', class: 'discord' };
+            } else {
+                return { icon: 'fas fa-link', class: 'other' };
+            }
+        }
+
+        function displayPostDetails(post) {
+            let carouselHTML = '';
+            if (post.images && post.images.length > 0) {
+                post.images.forEach((img, index) => {
+                    const imageUrl = img.startsWith('http') ? img : `http://localhost:8000${img}`;
+                    carouselHTML += `<div class="carousel-item ${index === 0 ? 'active' : ''}"><img src="${imageUrl}" class="d-block" alt="Item Image"></div>`;
                 });
-
-                let socialIconsHTML = '';
-                if(item.socials.line) socialIconsHTML += `<a href="${item.socials.line}" aria-label="Line"><i class="bi bi-line"></i></a>`;
-                if(item.socials.facebook) socialIconsHTML += `<a href="${item.socials.facebook}" aria-label="Facebook"><i class="bi bi-facebook"></i></a>`;
-                if(item.socials.twitter) socialIconsHTML += `<a href="${item.socials.twitter}" aria-label="X/Twitter"><i class="bi bi-twitter-x"></i></a>`;
-                if(item.socials.discord) socialIconsHTML += `<a href="${item.socials.discord}" aria-label="Discord"><i class="bi bi-discord"></i></a>`;
-                if(item.socials.instagram) socialIconsHTML += `<a href="${item.socials.instagram}" aria-label="Instagram"><i class="bi bi-instagram"></i></a>`;
-
-                contentDiv.innerHTML = `
-                    <div class="details-header">
-                        <h2>${item.name}</h2>
-                        <div class="contact-info dropdown">
-                            <button class="btn contact-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-telephone-fill"></i> Contact
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="tel:${item.phone}">${item.phone}</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="details-content">
-                        <div class="details-left">
-                            <div class="details-group category-group">
-                                <label>Category:</label>
-                                <span class="category-tag ${item.category.toLowerCase()}">${item.category}</span>
-                            </div>
-                            <div class="details-group">
-                                <label>User's name</label>
-                                <div class="data-box">${item.userName}</div>
-                            </div>
-                            <div class="details-group">
-                                <label>Place</label>
-                                <div class="data-box">${item.place}</div>
-                            </div>
-                            <div class="details-group">
-                                <label>Description</label>
-                                <div class="data-box" style="min-height: 120px;">${item.description}</div>
-                            </div>
-                            <div class="details-group">
-                                <label>Social account</label>
-                                <div class="social-icons">${socialIconsHTML}</div>
-                            </div>
-                        </div>
-                        <div class="details-right">
-                            <label>Item's picture</label>
-                            <div class="image-carousel-container">
-                                <div id="imageCarousel" class="carousel slide">
-                                    <div class="carousel-inner">${carouselHTML}</div>
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-                                    <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
-                                </div>
+            } else {
+                carouselHTML = `
+                    <div class="carousel-item active">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <div class="text-center text-muted">
+                                <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                <p class="mt-2">No images available</p>
                             </div>
                         </div>
                     </div>
                 `;
-                
-            } else {
-                contentDiv.innerHTML = '<h2 class="text-center text-danger">Item Not Found</h2>';
             }
-        });
+
+            let socialIconsHTML = '';
+            if (post.social_profiles && post.social_profiles.length > 0) {
+                post.social_profiles.forEach(social => {
+                    const { icon, class: socialClass } = getSocialMediaInfo(social.platform, social.profile_url);
+                    // Ensure URL has proper protocol
+                    let profileUrl = social.profile_url;
+                    if (!profileUrl.startsWith('http://') && !profileUrl.startsWith('https://')) {
+                        profileUrl = 'https://' + profileUrl;
+                    }
+                    
+                    socialIconsHTML += `
+                        <a href="${profileUrl}" target="_blank" class="${socialClass}" aria-label="${social.platform}">
+                            <i class="${icon}"></i>
+                        </a>
+                    `;
+                });
+            } else {
+                socialIconsHTML = '<span class="text-muted">No social links provided</span>';
+            }
+
+            // Format phone number for display
+            const formattedPhone = formatPhoneNumber(post.phone);
+
+            contentDiv.innerHTML = `
+                <div class="details-header">
+                    <h2>${post.item_name}</h2>
+                    <div class="contact-info dropdown">
+                        <button class="btn contact-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-telephone-fill"></i> Contact
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="tel:${post.phone}">
+                                <i class="bi bi-telephone me-2"></i>
+                                <span class="phone-number">${formattedPhone}</span>
+                            </a></li>
+                            <li><a class="dropdown-item" href="mailto:${post.email}">
+                                <i class="bi bi-envelope me-2"></i>
+                                ${post.email}
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="details-content">
+                    <div class="details-left">
+                        <div class="details-group category-group">
+                            <label>Category:</label>
+                            <span class="category-tag ${post.item_status.toLowerCase()}">${post.item_status}</span>
+                        </div>
+                        <div class="details-group">
+                            <label>User's name</label>
+                            <div class="data-box">${post.full_name}</div>
+                        </div>
+                        <div class="details-group">
+                            <label>Faculty</label>
+                            <div class="data-box">${post.faculty || 'Not specified'}</div>
+                        </div>
+                        <div class="details-group">
+                            <label>Place</label>
+                            <div class="data-box">${post.place}</div>
+                        </div>
+                        <div class="details-group">
+                            <label>Description</label>
+                            <div class="data-box description-box">${post.description}</div>
+                        </div>
+                        <div class="details-group">
+                            <label>Social account</label>
+                            <div class="social-icons">${socialIconsHTML}</div>
+                        </div>
+                    </div>
+                    <div class="details-right">
+                        <label>Item's picture</label>
+                        <div class="image-carousel-container">
+                            <div id="imageCarousel" class="carousel slide">
+                                <div class="carousel-inner">${carouselHTML}</div>
+                                ${post.images && post.images.length > 1 ? `
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon"></span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon"></span>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    });
     </script>
 
 </body>
