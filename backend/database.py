@@ -69,7 +69,7 @@ def init_database():
             CREATE TABLE IF NOT EXISTS social_profiles (
                 contact_id INT AUTO_INCREMENT PRIMARY KEY,
                 student_id INT,
-                platform VARCHAR(100) ENUM('Facebook', 'Twitter', 'Instagram', 'Line', 'Discord')) NOT NULL,
+                platform VARCHAR(100) ENUM('Facebook', 'Twitter / X', 'Instagram', 'Line', 'Discord')) NOT NULL,
                 profile_url VARCHAR(255) NOT NULL,
                 FOREIGN KEY (student_id) REFERENCES users(student_id)
             )
