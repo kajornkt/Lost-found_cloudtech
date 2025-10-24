@@ -58,11 +58,9 @@ def init_database():
                 phone VARCHAR(20) NOT NULL,
                 email VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
-                social_profiles_id INT,
                 profile_photo_url VARCHAR(255),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (social_profiles_id) REFERENCES social_profiles(contact_id)
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         ''')
         
@@ -79,7 +77,7 @@ def init_database():
 
         # Create post table
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS social_profiles (
+            CREATE TABLE IF NOT EXISTS post (
                 post_id INT AUTO_INCREMENT PRIMARY KEY,
                 student_id INT,
                 item_name VARCHAR(50) NOT NULL,
@@ -101,7 +99,7 @@ def init_database():
                 post_id INT,
                 image_url VARCHAR(255) NOT NULL,
                 image_order INT NOT NULL,
-                FOREIGN KEY (post_id) REFERENCES post(post_id)
+                FOREIGN KEY (post_id) REFERENCES post(post_id) # <-- This Foreign Key must reference the 'post' table
             )
         ''')
 
