@@ -468,89 +468,310 @@
         </div>
     </main>
     
+    <script src="api.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.getElementById('menuToggle');
-            const mobileMenu = document.getElementById('mobileMenu');
-            const addSocialLinkBtn = document.getElementById('addSocialLinkBtn');
-            const socialLinksContainer = document.getElementById('social-links-container');
-            const profilePictureInput = document.getElementById('profilePictureInput');
-            const fileNameDisplay = document.getElementById('fileNameDisplay');
-            const imagePreview = document.getElementById('imagePreview');
-            const imageIcon = document.getElementById('imageIcon');
-            const profileForm = document.getElementById('profileForm');
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const addSocialLinkBtn = document.getElementById('addSocialLinkBtn');
+        const socialLinksContainer = document.getElementById('social-links-container');
+        const profilePictureInput = document.getElementById('profilePictureInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const imagePreview = document.getElementById('imagePreview');
+        const imageIcon = document.getElementById('imageIcon');
+        const profileForm = document.getElementById('profileForm');
 
-            menuToggle.addEventListener('click', () => {
-                mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
+        let originalUserData = null;
+        let currentUser = null;
+
+        // Check if user is logged in
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+            window.location.href = 'signin.html';
+            return;
+        }
+
+        currentUser = JSON.parse(userData);
+        const studentId = currentUser.student_id;
+
+        // Add logout functionality
+        document.querySelectorAll('.logout-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                localStorage.removeItem('user');
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = 'signin.html';
             });
-            
-            addSocialLinkBtn.addEventListener('click', createSocialLinkGroup);
-            profilePictureInput.addEventListener('change', handleFileSelect);
+        });
 
-            profileForm.addEventListener('submit', function(e) {
-                e.preventDefault(); 
-                alert('Profile Saved!');
-            });
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        addSocialLinkBtn.addEventListener('click', createSocialLinkGroup);
+        profilePictureInput.addEventListener('change', handleFileSelect);
 
-            profileForm.addEventListener('reset', function() {
-                setTimeout(() => {
-                    resetProfilePicture();
-                    resetSocialLinks();
-                }, 0);
-            });
+        // Load user data
+        async function loadUserProfile() {
+            try {
+                const userProfile = await LostFoundAPI.getUserProfile(studentId);
+                originalUserData = JSON.parse(JSON.stringify(userProfile)); // Deep copy for reset
+                populateForm(userProfile);
+            } catch (error) {
+                console.error('Failed to load user profile:', error);
+                // Use localStorage data as fallback
+                populateForm(currentUser);
+            }
+        }
 
-            function createSocialLinkGroup() {
-                const div = document.createElement('div');
-                div.className = 'social-link-group';
-                div.innerHTML = `
-                    <div class="social-input-wrapper">
-                        <div class="select-wrapper">
-                            <select class="form-control-custom">
-                                <option>Facebook</option>
-                                <option>Instagram</option>
-                                <option>LINE</option>
-                                <option>Twitter / X</option>
-                                <option>Discord</option>
-                            </select>
-                        </div>
-                        <input type="text" placeholder="Enter link or username">
-                    </div>
-                    <button type="button" class="btn-remove-social" title="Remove">&times;</button>
-                `;
-                socialLinksContainer.appendChild(div);
+        function populateForm(userData) {
+            // Populate form fields
+            document.getElementById('name').value = userData.full_name || '';
+            document.getElementById('faculty').value = userData.faculty || 'Select';
+            document.getElementById('class-year').value = userData.class_year || '';
+            document.getElementById('email').value = userData.email || '';
+            document.getElementById('phone').value = userData.phone || '';
 
-                div.querySelector('.btn-remove-social').addEventListener('click', function() {
-                    this.parentElement.remove();
+            // Populate profile picture
+            if (userData.profile_photo_url) {
+                imagePreview.src = userData.profile_photo_url;
+                imagePreview.style.display = 'block';
+                imageIcon.style.display = 'none';
+                fileNameDisplay.textContent = 'Current profile picture';
+            }
+
+            // Populate social links
+            resetSocialLinks();
+            if (userData.social_profiles && userData.social_profiles.length > 0) {
+                userData.social_profiles.forEach(social => {
+                    createSocialLinkGroupWithData(social.platform, social.profile_url);
                 });
+            } else {
+                createSocialLinkGroup();
             }
+        }
+
+        profileForm.addEventListener('submit', async function(e) {
+            e.preventDefault(); 
             
-            function handleFileSelect() {
-                const file = this.files[0];
-                if (file) {
-                    fileNameDisplay.textContent = file.name;
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        imagePreview.src = e.target.result;
-                        imagePreview.style.display = 'block';
-                        imageIcon.style.display = 'none';
-                    }
-                    reader.readAsDataURL(file);
+            if (!validateForm()) {
+                return;
+            }
+
+            try {
+                const formData = collectFormData();
+                // Here you would call your backend API to update the profile
+                // For now, we'll update localStorage and show success message
+                await updateUserProfile(formData);
+                alert('Profile updated successfully!');
+                window.location.href = 'profile.html';
+            } catch (error) {
+                console.error('Failed to update profile:', error);
+                alert('Failed to update profile. Please try again.');
+            }
+        });
+
+        profileForm.addEventListener('reset', function() {
+            setTimeout(() => {
+                if (originalUserData) {
+                    populateForm(originalUserData);
                 }
+                resetProfilePicture();
+            }, 0);
+        });
+
+        function validateForm() {
+            const name = document.getElementById('name').value.trim();
+            const faculty = document.getElementById('faculty').value;
+            const classYear = document.getElementById('class-year').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!name) {
+                alert('Please enter your name.');
+                document.getElementById('name').focus();
+                return false;
             }
+
+            if (faculty === 'Select') {
+                alert('Please select your faculty.');
+                document.getElementById('faculty').focus();
+                return false;
+            }
+
+            if (!classYear) {
+                alert('Please enter your class year.');
+                document.getElementById('class-year').focus();
+                return false;
+            }
+
+            if (!email) {
+                alert('Please enter your email.');
+                document.getElementById('email').focus();
+                return false;
+            }
+
+            // KMITL email validation
+            const emailRegex = /^[^\s@]+@kmitl\.ac\.th$/;
+            if (!emailRegex.test(email)) {
+                alert('Please use a valid KMITL email address (xxxxxxx@kmitl.ac.th).');
+                document.getElementById('email').focus();
+                return false;
+            }
+
+            if (!phone) {
+                alert('Please enter your phone number.');
+                document.getElementById('phone').focus();
+                return false;
+            }
+
+            // Validate social links
+            const socialLinks = collectSocialLinks();
+            if (socialLinks.length === 0) {
+                alert('Please add at least one social media link.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function collectFormData() {
+            return {
+                full_name: document.getElementById('name').value.trim(),
+                faculty: document.getElementById('faculty').value,
+                class_year: document.getElementById('class-year').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                social_profiles: collectSocialLinks(),
+                profile_photo_url: imagePreview.src || currentUser.profile_photo_url
+            };
+        }
+
+        function collectSocialLinks() {
+            return Array.from(socialLinksContainer.querySelectorAll('.social-link-group')).map(group => {
+                const platform = group.querySelector('select').value;
+                const profile_url = group.querySelector('input').value.trim();
+                return { platform, profile_url };
+            }).filter(link => link.platform && link.profile_url);
+        }
+
+        async function updateUserProfile(formData) {
+            // Update localStorage with new data
+            const updatedUser = {
+                ...currentUser,
+                ...formData
+            };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+
+            // Here you would call your backend API to update the profile
+            // Example: await LostFoundAPI.updateUserProfile(studentId, formData);
             
-            function resetProfilePicture() {
+            // For now, we'll just log the data
+            console.log('Profile data to update:', formData);
+            return Promise.resolve();
+        }
+
+        function createSocialLinkGroup(platform = '', profileUrl = '') {
+            const div = document.createElement('div');
+            div.className = 'social-link-group';
+            div.innerHTML = `
+                <div class="social-input-wrapper">
+                    <div class="select-wrapper">
+                        <select class="form-control-custom">
+                            <option value="">Select Platform</option>
+                            <option value="Facebook" ${platform === 'Facebook' ? 'selected' : ''}>Facebook</option>
+                            <option value="Instagram" ${platform === 'Instagram' ? 'selected' : ''}>Instagram</option>
+                            <option value="LINE" ${platform === 'LINE' ? 'selected' : ''}>LINE</option>
+                            <option value="Twitter" ${platform === 'Twitter' ? 'selected' : ''}>Twitter / X</option>
+                            <option value="Discord" ${platform === 'Discord' ? 'selected' : ''}>Discord</option>
+                        </select>
+                    </div>
+                    <input type="text" placeholder="Enter link or username" value="${profileUrl || ''}">
+                </div>
+                <button type="button" class="btn-remove-social" title="Remove">&times;</button>
+            `;
+            socialLinksContainer.appendChild(div);
+
+            div.querySelector('.btn-remove-social').addEventListener('click', function() {
+                this.parentElement.remove();
+            });
+        }
+
+        function createSocialLinkGroupWithData(platform, profileUrl) {
+            createSocialLinkGroup(platform, profileUrl);
+        }
+        
+        function handleFileSelect() {
+            const file = this.files[0];
+            if (file) {
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please select a valid image file (JPEG, JPG, or PNG).');
+                    this.value = '';
+                    return;
+                }
+
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB.');
+                    this.value = '';
+                    return;
+                }
+
+                fileNameDisplay.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    imageIcon.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function resetProfilePicture() {
+            if (originalUserData && originalUserData.profile_photo_url) {
+                imagePreview.src = originalUserData.profile_photo_url;
+                imagePreview.style.display = 'block';
+                imageIcon.style.display = 'none';
+                fileNameDisplay.textContent = 'Current profile picture';
+            } else {
                 fileNameDisplay.textContent = 'Profile picture';
                 imagePreview.style.display = 'none';
                 imagePreview.src = '';
                 imageIcon.style.display = 'flex';
             }
+            profilePictureInput.value = '';
+        }
 
-            function resetSocialLinks() {
-                socialLinksContainer.innerHTML = '';
-            }
+        function resetSocialLinks() {
+            socialLinksContainer.innerHTML = '';
+        }
+
+        // Add real-time email validation
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value.trim();
+            const emailRegex = /^[^\s@]+@kmitl\.ac\.th$/;
             
-            createSocialLinkGroup(); 
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = 'red';
+                if (!document.getElementById('emailHint')) {
+                    const hint = document.createElement('small');
+                    hint.id = 'emailHint';
+                    hint.className = 'text-danger mt-1';
+                    hint.textContent = 'Please use @kmitl.ac.th email only';
+                    this.parentNode.appendChild(hint);
+                }
+            } else {
+                this.style.borderColor = '';
+                const hint = document.getElementById('emailHint');
+                if (hint) hint.remove();
+            }
         });
+
+        // Load user profile when page loads
+        loadUserProfile();
+    });
     </script>
 
 </body>

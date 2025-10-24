@@ -129,25 +129,36 @@
         profileForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            // Validate form before submission
+            if (!validateForm()) {
+                return;
+            }
+            
             // Collect form data
             const formData = {
-                name: document.getElementById('nameInput').value,
+                full_name: document.getElementById('nameInput').value.trim(),
                 faculty: document.getElementById('facultySelect').value,
-                class_year: document.getElementById('classYearInput').value,
-                phone: document.getElementById('phoneInput').value,
-                email: document.getElementById('emailInput').value,
+                class_year: document.getElementById('classYearInput').value.trim(),
+                phone: document.getElementById('phoneInput').value.trim(),
+                email: document.getElementById('emailInput').value.trim(),
                 password: document.getElementById('passwordInput').value,
                 confirm_password: document.getElementById('confirmPasswordInput').value,
-                social_links: Array.from(socialLinksContainer.querySelectorAll('.social-link-group')).map(group => {
-                    const type = group.querySelector('select').value;
-                    const link = group.querySelector('input').value;
-                    return { type, link };
-                }).filter(link => link.link.trim() !== '') // Remove empty links
+                social_profiles: Array.from(socialLinksContainer.querySelectorAll('.social-link-group')).map(group => {
+                    const platform = group.querySelector('select').value;
+                    const profile_url = group.querySelector('input').value.trim();
+                    return { platform, profile_url };
+                }).filter(link => link.profile_url !== '') // Remove empty links
             };
+
+            // Validate social links
+            if (formData.social_profiles.length === 0) {
+                alert('Please add at least one social media link.');
+                return;
+            }
 
             // Send to Python backend
             try {
-                const response = await fetch('http://localhost:8000/api/signup', {
+                const response = await fetch('http://localhost:8000/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -157,11 +168,11 @@
 
                 const result = await response.json();
                 
-                if (response.ok) {
+                if (response.ok && result.success) {
                     alert('Account created successfully!');
                     window.location.href = 'signin.html';
                 } else {
-                    alert('Error: ' + result.detail);
+                    alert('Error: ' + (result.detail || 'Registration failed'));
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -169,23 +180,136 @@
             }
         });
 
-        // Social link functions (keep existing)
+        // Form validation function
+        function validateForm() {
+            const name = document.getElementById('nameInput').value.trim();
+            const faculty = document.getElementById('facultySelect').value;
+            const classYear = document.getElementById('classYearInput').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const confirmPassword = document.getElementById('confirmPasswordInput').value;
+
+            // Check if all fields are filled
+            if (!name) {
+                alert('Please enter your name.');
+                document.getElementById('nameInput').focus();
+                return false;
+            }
+
+            if (faculty === 'select') {
+                alert('Please select your faculty.');
+                document.getElementById('facultySelect').focus();
+                return false;
+            }
+
+            if (!classYear) {
+                alert('Please enter your class year.');
+                document.getElementById('classYearInput').focus();
+                return false;
+            }
+
+            if (!phone) {
+                alert('Please enter your phone number.');
+                document.getElementById('phoneInput').focus();
+                return false;
+            }
+
+            if (!email) {
+                alert('Please enter your email.');
+                document.getElementById('emailInput').focus();
+                return false;
+            }
+
+            // Email validation - KMITL domain only
+            const emailRegex = /^[^\s@]+@kmitl\.ac\.th$/;
+            if (!emailRegex.test(email)) {
+                alert('Please use a valid KMITL email address (xxxxxxx@kmitl.ac.th).');
+                document.getElementById('emailInput').focus();
+                return false;
+            }
+
+            if (!password) {
+                alert('Please enter a password.');
+                document.getElementById('passwordInput').focus();
+                return false;
+            }
+
+            // Password length validation
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                document.getElementById('passwordInput').focus();
+                return false;
+            }
+
+            if (!confirmPassword) {
+                alert('Please confirm your password.');
+                document.getElementById('confirmPasswordInput').focus();
+                return false;
+            }
+
+            // Password match validation
+            if (password !== confirmPassword) {
+                alert('Password and confirm password do not match!');
+                document.getElementById('confirmPasswordInput').focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // Real-time email validation
+        document.getElementById('emailInput').addEventListener('blur', function() {
+            const email = this.value.trim();
+            const emailRegex = /^[^\s@]+@kmitl\.ac\.th$/;
+            
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = 'red';
+                // Show hint text
+                if (!document.getElementById('emailHint')) {
+                    const hint = document.createElement('small');
+                    hint.id = 'emailHint';
+                    hint.className = 'text-danger mt-1';
+                    hint.textContent = 'Please use @kmitl.ac.th email only';
+                    this.parentNode.appendChild(hint);
+                }
+            } else {
+                this.style.borderColor = '';
+                const hint = document.getElementById('emailHint');
+                if (hint) hint.remove();
+            }
+        });
+
+        // Real-time password match validation
+        document.getElementById('confirmPasswordInput').addEventListener('input', function() {
+            const password = document.getElementById('passwordInput').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.style.borderColor = 'red';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+
+        // Social link functions
         function createSocialLinkGroup(removable = true) {
             const div = document.createElement('div');
             div.className = 'social-link-group d-flex align-items-start mb-3';
             
             div.innerHTML = `
                 <div style="width: 150px; flex-shrink: 0;" class="me-2">
-                    <select class="form-select custom-form-control">
+                    <select class="form-select custom-form-control" required>
+                        <option value="">Select Platform</option>
                         <option value="Facebook">Facebook</option>
                         <option value="Instagram">Instagram</option>
                         <option value="LINE">LINE</option>
-                        <option value="Twitter / X">Twitter / X</option>
+                        <option value="Twitter">Twitter / X</option>
                         <option value="Discord">Discord</option>
                         <option value="Other">Other</option>
                     </select>
                 </div>
-                <input type="text" class="form-control custom-form-control" placeholder="link to social profile">
+                <input type="text" class="form-control custom-form-control" placeholder="Enter profile link" required>
                 ${removable ? '<button type="button" class="btn btn-sm btn-danger ms-2" style="flex-shrink: 0; height: 44px; line-height: 1;">&times;</button>' : ''}
             `;
             
@@ -200,6 +324,24 @@
                     }
                 });
             }
+
+            // Add validation to new inputs
+            const select = div.querySelector('select');
+            const input = div.querySelector('input');
+            
+            select.addEventListener('change', validateSocialLinks);
+            input.addEventListener('input', validateSocialLinks);
+        }
+        
+        function validateSocialLinks() {
+            const socialLinks = Array.from(socialLinksContainer.querySelectorAll('.social-link-group'));
+            const hasValidLink = socialLinks.some(group => {
+                const platform = group.querySelector('select').value;
+                const link = group.querySelector('input').value.trim();
+                return platform && link;
+            });
+            
+            return hasValidLink;
         }
         
         function resetSocialLinks() {
@@ -207,8 +349,9 @@
             createSocialLinkGroup(false);
         }
 
+        // Initialize with one social link
         resetSocialLinks();
-        });
+    });
     </script>
 </script>
 </body>

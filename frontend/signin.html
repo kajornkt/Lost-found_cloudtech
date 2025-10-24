@@ -48,16 +48,48 @@
     document.addEventListener('DOMContentLoaded', function() {
         const loginForm = document.querySelector('form');
         
+        // Check if user is already logged in
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            // Redirect to home page if already logged in
+            window.location.href = 'index.html';
+            return;
+        }
+        
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            
+            // Validate form
+            if (!email) {
+                alert('Please enter your email.');
+                document.getElementById('emailInput').focus();
+                return;
+            }
+            
+            // KMITL email validation
+            const emailRegex = /^[^\s@]+@kmitl\.ac\.th$/;
+            if (!emailRegex.test(email)) {
+                alert('Please use a valid KMITL email address (xxxxxxx@kmitl.ac.th).');
+                document.getElementById('emailInput').focus();
+                return;
+            }
+            
+            if (!password) {
+                alert('Please enter your password.');
+                document.getElementById('passwordInput').focus();
+                return;
+            }
+            
             const formData = {
-                email: document.getElementById('emailInput').value,
-                password: document.getElementById('passwordInput').value
+                email: email,
+                password: password
             };
 
             try {
-                const response = await fetch('http://localhost:8000/api/signin', {
+                const response = await fetch('http://localhost:8000/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -67,19 +99,54 @@
 
                 const result = await response.json();
                 
-                if (response.ok) {
-                    alert('Login successful! Welcome ' + result.user.name);
-                    // Redirect to your main page
-                    // window.location.href = 'dashboard.html';
+                if (response.ok && result.success) {
+                    // Store user data in localStorage
+                    localStorage.setItem('user', JSON.stringify(result.user_data));
+                    localStorage.setItem('isLoggedIn', 'true');
+                    
+                    alert('Login successful! Welcome ' + result.user_data.name);
+                    // Redirect to home page
+                    window.location.href = 'index.html';
                 } else {
-                    alert('Error: ' + result.detail);
+                    alert('Error: ' + (result.detail || 'Invalid email or password'));
                 }
             } catch (error) {
                 console.error('Error:', error);
                 alert('Login failed. Please check if backend is running.');
             }
-            });
         });
+        
+        // Real-time KMITL email validation
+        document.getElementById('emailInput').addEventListener('blur', function() {
+            const email = this.value.trim();
+            const emailRegex = /^[^\s@]+@kmitl\.ac\.th$/;
+            
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = 'red';
+                // Show hint text
+                if (!document.getElementById('emailHint')) {
+                    const hint = document.createElement('small');
+                    hint.id = 'emailHint';
+                    hint.className = 'text-danger mt-1';
+                    hint.textContent = 'KMITL email required (@kmitl.ac.th)';
+                    this.parentNode.appendChild(hint);
+                }
+            } else {
+                this.style.borderColor = '';
+                const hint = document.getElementById('emailHint');
+                if (hint) hint.remove();
+            }
+        });
+
+        // Add input validation styling for password
+        document.getElementById('passwordInput').addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                this.style.borderColor = 'red';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+    });
     </script>
 </body>
 </html>
